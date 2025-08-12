@@ -1,0 +1,81 @@
+# GitHub Pages Configuration for ZKyNet
+title: "ZKyNet - Privacy Infrastructure with Legal Compliance"
+description: "Building the next generation of privacy infrastructure that bridges Tor's anonymity guarantees with real-world legal compliance through Zero-Knowledge proofs."
+url: "https://zkynet.github.io"
+baseurl: ""
+
+# Site settings
+timezone: UTC
+encoding: utf-8
+markdown: kramdown
+highlighter: rouge
+
+# GitHub Pages specific settings
+github:
+  repository_url: https://github.com/zkynet/zkynet.github.io
+
+# Social media and external links
+social:
+  github: zkynet
+  twitter: zkynet_official
+  linkedin: company/zkynet
+
+# SEO and meta information
+author: ZKyNet Team
+keywords: "privacy, zero-knowledge, tor, anonymity, legal compliance, rust, blockchain, VPN, security"
+image: "/Logo/ZKyNet-logo-512x512.png"
+
+# Navigation (for potential future Jekyll integration)
+navigation:
+  - title: "Home"
+    url: "/"
+  - title: "About"
+    url: "/#about"
+  - title: "Technology"
+    url: "/#technology"
+  - title: "Products"
+    url: "/#products"
+  - title: "Support"
+    url: "/#support"
+  - title: "Contact"
+    url: "/#contact"
+
+# Exclude files from Jekyll processing
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+  - .sass-cache
+  - .jekyll-cache
+  - .git
+  - .github
+
+# Include files in the build
+include:
+  - _pages
+  - assets
+
+# Plugin configuration
+plugins:
+  - jekyll-sitemap
+  - jekyll-feed
+  - jekyll-seo-tag
+
+# Analytics (placeholder for future)
+# google_analytics: G-XXXXXXXXXX
+
+# Contact information
+contact:
+  email: contact@zkynet.org
+  support: support@zkynet.org
+  press: press@zkynet.org
+
+# Company information
+company:
+  name: "ZKyNet"
+  legal_name: "ZKyNet Inc."
+  founded: 2025
+  location: "Global"
+  industry: "Privacy Infrastructure & Technology"
