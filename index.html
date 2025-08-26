@@ -1482,10 +1482,6 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <label for="contact-email" class="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
-                                    <input type="email" id="contact-email" name="email" class="w-full px-4 py-3 rounded-lg bg-slate-700 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-zky-purple focus:border-transparent" placeholder="john.doe@company.com" required>
-                                </div>
-                                <div>
                                     <label for="contact-company" class="block text-sm font-medium text-gray-300 mb-2">Company/Organization (Optional)</label>
                                     <input type="text" id="contact-company" name="company" class="w-full px-4 py-3 rounded-lg bg-slate-700 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-zky-purple focus:border-transparent" placeholder="Your Company">
                                 </div>
@@ -1739,7 +1735,7 @@
                     handleNewsletterSignup(data);
                 } else if (form.querySelector('#node-email')) {
                     handleNodeOperatorSignup(data);
-                } else if (form.querySelector('#contact-email')) {
+                } else if (form.querySelector('#contact-subject')) {
                     handleContactForm(data);
                 }
             });
@@ -1845,26 +1841,8 @@
                 submitButton.textContent = 'Processing...';
                 submitButton.disabled = true;
 
-                // Check for existing client email in browser storage
-                const storedClientEmail = checkForClientEmail();
-                
-                // Prepare the contact form data
-                const contactData = {
-                    name: `${data.firstName} ${data.lastName}`.trim(),
-                    email: data.email,
-                    company: data.company || '',
-                    subject: data.subject,
-                    message: data.message,
-                    clientEmail: storedClientEmail
-                };
-
-                // Store user email for future use (with consent)
-                if (data.email && data.terms) {
-                    storeClientEmail(data.email);
-                }
-
                 // Collect email for support if newsletter checkbox is checked
-                if (data.newsletter) {
+                if (data.newsletter && data.email) {
                     try {
                         await fetch('http://localhost:8080/api/support', {
                             method: 'POST',
@@ -1878,11 +1856,19 @@
                     }
                 }
                 
-                // Log contact attempt for debugging
-                console.log('Contact form submitted:', contactData);
+                // Prepare the contact form data
+                const contactData = {
+                    name: `${data.firstName} ${data.lastName}`.trim(),
+                    company: data.company || '',
+                    subject: data.subject,
+                    message: data.message
+                };
                 
-                // Dynamic contact handling based on client email availability
-                await handleDynamicContact(contactData, storedClientEmail);
+                // Show email service selection modal
+                showEmailServiceModal(contactData);
+                
+                // Clear the form
+                document.querySelector('form').reset();
 
             } catch (error) {
                 console.error('Contact form error:', error);
@@ -1894,16 +1880,6 @@
                     submitButton.textContent = originalText;
                     submitButton.disabled = false;
                 }
-            }
-        }
-
-        // Check for existing client email in browser storage
-        function checkForClientEmail() {
-            try {
-                return localStorage.getItem('zkynet_client_email') || sessionStorage.getItem('zkynet_client_email');
-            } catch (error) {
-                console.log('Storage access error:', error);
-                return null;
             }
         }
 
@@ -1922,64 +1898,181 @@
             }
         }
 
-        // Handle dynamic contact based on email client availability
-        async function handleDynamicContact(contactData, clientEmail) {
-            const hasEmailClient = await detectEmailClient();
+        // Show email service selection modal
+        function showEmailServiceModal(contactData) {
+            const modalHtml = `
+                <div id="email-service-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onclick="handleModalBackdropClick(event)">
+                    <div class="bg-slate-800 rounded-lg max-w-lg w-full" onclick="event.stopPropagation()">
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-2xl font-bold text-white">Choose Email Service</h2>
+                                <button onclick="closeEmailServiceModal()" class="text-gray-400 hover:text-white transition-colors">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            
+                            <p class="text-gray-300 mb-6">Select your preferred email service to send your message:</p>
+                            
+                            <div class="space-y-3">
+                                <button onclick="openEmailClient('mailto', ${JSON.stringify(contactData).replace(/"/g, '&quot;')})" 
+                                        class="w-full flex items-center justify-between p-4 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors text-left">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
+                                                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-white font-medium">Send with my Email App</h3>
+                                            <p class="text-gray-400 text-sm">Opens your default email client</p>
+                                        </div>
+                                    </div>
+                                    <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </button>
+
+                                <button onclick="openEmailClient('gmail', ${JSON.stringify(contactData).replace(/"/g, '&quot;')})" 
+                                        class="w-full flex items-center justify-between p-4 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors text-left">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
+                                            <span class="text-white font-bold text-sm">G</span>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-white font-medium">Send with Gmail</h3>
+                                            <p class="text-gray-400 text-sm">Opens Gmail in a new tab</p>
+                                        </div>
+                                    </div>
+                                    <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </button>
+
+                                <button onclick="openEmailClient('outlook', ${JSON.stringify(contactData).replace(/"/g, '&quot;')})" 
+                                        class="w-full flex items-center justify-between p-4 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors text-left">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-blue-700 rounded-full flex items-center justify-center">
+                                            <span class="text-white font-bold text-sm">O</span>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-white font-medium">Send with Outlook.com</h3>
+                                            <p class="text-gray-400 text-sm">Opens Outlook webmail in a new tab</p>
+                                        </div>
+                                    </div>
+                                    <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </button>
+
+                                <button onclick="openEmailClient('yahoo', ${JSON.stringify(contactData).replace(/"/g, '&quot;')})" 
+                                        class="w-full flex items-center justify-between p-4 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors text-left">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
+                                            <span class="text-white font-bold text-sm">Y</span>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-white font-medium">Send with Yahoo Mail</h3>
+                                            <p class="text-gray-400 text-sm">Opens Yahoo webmail in a new tab</p>
+                                        </div>
+                                    </div>
+                                    <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
             
-            if (hasEmailClient && clientEmail) {
-                // User has email client and stored email - open structured email
-                openStructuredEmail(contactData, clientEmail);
-                showSuccessMessage('Opening your email client with a structured message. Please send the email to complete your inquiry.');
-            } else if (hasEmailClient && !clientEmail) {
-                // User has email client but no stored email - open with contact email
-                openStructuredEmail(contactData, 'contact@zkynet.org');
-                showSuccessMessage('Opening your email client. Please send the email to complete your inquiry.');
-            } else {
-                // No email client detected - provide manual contact info
-                showManualContactInfo(contactData);
-            }
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
             
-            // Clear the form
-            document.querySelector('form').reset();
+            // Add escape key listener
+            document.addEventListener('keydown', handleModalEscapeKey);
         }
 
-        // Detect if user has an email client
-        async function detectEmailClient() {
-            try {
-                // Try to create a mailto link and see if it's supported
-                const testLink = document.createElement('a');
-                testLink.href = 'mailto:test@example.com';
-                
-                // Check if mailto protocol is supported
-                return window.navigator.platform !== 'Win32' || 
-                       typeof window.ActiveXObject !== 'undefined' ||
-                       /mailto:/i.test(testLink.protocol);
-            } catch (error) {
-                return false;
+        // Close email service modal
+        function closeEmailServiceModal() {
+            const modal = document.getElementById('email-service-modal');
+            if (modal) {
+                modal.remove();
+                // Remove escape key listener
+                document.removeEventListener('keydown', handleModalEscapeKey);
             }
         }
 
-        // Open structured email in client
-        function openStructuredEmail(contactData, recipientEmail) {
-            const subject = encodeURIComponent(`ZKyNet Inquiry: ${contactData.subject}`);
-            const body = encodeURIComponent(createEmailTemplate(contactData));
+        // Handle backdrop click to close modal
+        function handleModalBackdropClick(event) {
+            if (event.target.id === 'email-service-modal') {
+                closeEmailServiceModal();
+            }
+        }
+
+        // Handle escape key to close modal
+        function handleModalEscapeKey(event) {
+            if (event.key === 'Escape' && document.getElementById('email-service-modal')) {
+                closeEmailServiceModal();
+            }
+        }
+
+        // Handle email service selection
+        function openEmailClient(service, contactData) {
+            // Convert subject code to readable format
+            const subjectMap = {
+                'enterprise': 'Enterprise Partnership',
+                'technical': 'Technical Support',
+                'investment': 'Investment Opportunity',
+                'media': 'Media & Press',
+                'general': 'General Inquiry',
+                'other': 'Other'
+            };
+            const subjectText = subjectMap[contactData.subject] || contactData.subject;
+            const subject = encodeURIComponent(`ZKyNet Inquiry: ${subjectText}`);
+            const body = encodeURIComponent(createEmailTemplate(contactData, subjectText));
+            const to = encodeURIComponent('contact@zkynet.org');
             
-            const mailtoLink = `mailto:${recipientEmail}?subject=${subject}&body=${body}`;
+            let url;
             
-            // Try to open email client
-            window.location.href = mailtoLink;
+            switch (service) {
+                case 'mailto':
+                    url = `mailto:${to}?subject=${subject}&body=${body}`;
+                    window.location.href = url;
+                    break;
+                    
+                case 'gmail':
+                    url = `https://mail.google.com/mail/?view=cm&fs=1&to=${to}&su=${subject}&body=${body}`;
+                    window.open(url, '_blank');
+                    break;
+                    
+                case 'outlook':
+                    url = `https://outlook.live.com/owa/?path=/mail/action/compose&to=${to}&subject=${subject}&body=${body}`;
+                    window.open(url, '_blank');
+                    break;
+                    
+                case 'yahoo':
+                    url = `https://compose.mail.yahoo.com/?to=${to}&subject=${subject}&body=${body}`;
+                    window.open(url, '_blank');
+                    break;
+                    
+            }
+            
+            // Close modal and show success message
+            closeEmailServiceModal();
+            showSuccessMessage('Opening your email service. Please send the email to complete your inquiry.');
         }
 
         // Create structured email template
-        function createEmailTemplate(contactData) {
+        function createEmailTemplate(contactData, subjectText) {
             return `Hello ZKyNet Team,
 
 My inquiry details:
 
 Name: ${contactData.name}
-Email: ${contactData.email}
-${contactData.company ? `Company: ${contactData.company}` : ''}
-Subject: ${contactData.subject}
+${contactData.company ? `Company: ${contactData.company}\n` : ''}Subject: ${subjectText || contactData.subject}
 
 Message:
 ${contactData.message}
@@ -1999,84 +2092,7 @@ ${contactData.name}
 
 ---
 This email was generated through the ZKyNet contact form.
-Please reply to this email address for all correspondence.`;
-        }
-
-        // Show manual contact information when no email client is available
-        function showManualContactInfo(contactData) {
-            const modalHtml = `
-                <div id="contact-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-                    <div class="bg-slate-800 rounded-lg max-w-2xl w-full max-h-90vh overflow-y-auto">
-                        <div class="p-6">
-                            <div class="flex justify-between items-center mb-4">
-                                <h2 class="text-2xl font-bold text-white">Contact Information</h2>
-                                <button onclick="closeContactModal()" class="text-gray-400 hover:text-white">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                    </svg>
-                                </button>
-                            </div>
-                            
-                            <div class="text-gray-300 mb-6">
-                                <p class="mb-4">Since no email client was detected, please contact us directly using the information below:</p>
-                                
-                                <div class="bg-slate-700 p-4 rounded-lg mb-4">
-                                    <h3 class="text-white font-semibold mb-2">📧 Email Contact</h3>
-                                    <p><strong>Email:</strong> <a href="mailto:contact@zkynet.org" class="text-blue-400 hover:text-blue-300">contact@zkynet.org</a></p>
-                                    <p class="text-sm text-gray-400 mt-2">Expected response time: 24-48 hours</p>
-                                </div>
-                                
-                                <div class="bg-slate-700 p-4 rounded-lg mb-4">
-                                    <h3 class="text-white font-semibold mb-2">📝 Email Structure Template</h3>
-                                    <p class="mb-2">When emailing us, please use this structure for faster processing:</p>
-                                    <div class="bg-slate-600 p-3 rounded text-sm font-mono">
-                                        <p><strong>Subject:</strong> ZKyNet Inquiry: ${contactData.subject}</p>
-                                        <br>
-                                        <p><strong>1. Issue Assessment:</strong> Brief description of your inquiry</p>
-                                        <p><strong>2. Context:</strong> Relevant background information</p>
-                                        <p><strong>3. Expected Outcome:</strong> What you're hoping to achieve</p>
-                                        <p><strong>4. Timeline:</strong> Any urgency or deadlines</p>
-                                        <br>
-                                        <p><strong>Your Details:</strong></p>
-                                        <p>Name: ${contactData.name}</p>
-                                        <p>Email: ${contactData.email}</p>
-                                        ${contactData.company ? `<p>Company: ${contactData.company}</p>` : ''}
-                                        <br>
-                                        <p><strong>Message:</strong></p>
-                                        <p>${contactData.message}</p>
-                                    </div>
-                                </div>
-                                
-                                <div class="bg-slate-700 p-4 rounded-lg">
-                                    <h3 class="text-white font-semibold mb-2">🚀 Alternative Channels</h3>
-                                    <ul class="space-y-1 text-sm">
-                                        <li>• <strong>Documentation:</strong> Check our <a href="documentation.html" class="text-blue-400 hover:text-blue-300">technical documentation</a> first</li>
-                                        <li>• <strong>GitHub:</strong> For technical issues, open an issue on our repository</li>
-                                        <li>• <strong>Privacy:</strong> <a href="mailto:privacy@zkynet.org" class="text-blue-400 hover:text-blue-300">privacy@zkynet.org</a> for privacy concerns</li>
-                                        <li>• <strong>Legal:</strong> <a href="mailto:legal@zkynet.org" class="text-blue-400 hover:text-blue-300">legal@zkynet.org</a> for legal matters</li>
-                                    </ul>
-                                </div>
-                            </div>
-                            
-                            <div class="flex justify-end">
-                                <button onclick="closeContactModal()" class="bg-zky-purple text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors">
-                                    Got it, thanks!
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            document.body.insertAdjacentHTML('beforeend', modalHtml);
-        }
-
-        // Close contact modal
-        function closeContactModal() {
-            const modal = document.getElementById('contact-modal');
-            if (modal) {
-                modal.remove();
-            }
+Please reply to the sender's email address for all correspondence.`;
         }
 
         function showSuccessMessage(message) {
