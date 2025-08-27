@@ -1,0 +1,255 @@
+/**
+ * ZKyNet Landing Page - Contact Form Handler
+ * Email service modal and form functionality
+ */
+
+// Initialize contact form when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    initializeContactForm();
+});
+
+/**
+ * Initialize contact form functionality
+ */
+function initializeContactForm() {
+    const contactForm = document.querySelector('#contact-form');
+    if (contactForm) {
+        ZKyNet.handleFormSubmission(contactForm, handleContactForm);
+    }
+}
+
+/**
+ * Handle contact form submission
+ */
+async function handleContactForm(data) {
+    try {
+        // Show loading state
+        const submitButton = document.querySelector('#contact-form button[type="submit"]');
+        const originalText = submitButton ? submitButton.textContent : '';
+        
+        if (submitButton) {
+            submitButton.textContent = 'Processing...';
+            submitButton.disabled = true;
+        }
+
+        
+        // Prepare the contact form data
+        const contactData = {
+            name: `${data.firstName} ${data.lastName}`.trim(),
+            company: data.company || '',
+            subject: data.subject,
+            message: data.message
+        };
+        
+        // Show email service selection modal
+        showEmailServiceModal(contactData);
+        
+        // Clear the form
+        document.querySelector('#contact-form').reset();
+
+    } catch (error) {
+        console.error('Contact form error:', error);
+        ZKyNet.showErrorMessage('Network error. Please check your connection and try again.');
+    } finally {
+        // Reset button state
+        const submitButton = document.querySelector('#contact-form button[type="submit"]');
+        if (submitButton) {
+            submitButton.textContent = originalText || 'Send Message';
+            submitButton.disabled = false;
+        }
+    }
+}
+
+/**
+ * Show email service selection modal
+ */
+function showEmailServiceModal(contactData) {
+    const modalHtml = `
+        <div id="email-service-modal" class="modal-backdrop" onclick="handleModalBackdropClick(event)">
+            <div class="modal-content" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <h2 class="modal-title">Choose Email Service</h2>
+                    <button onclick="closeEmailServiceModal()" class="modal-close-btn">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div style="padding: 0 1.5rem 1.5rem;">
+                    <p style="color: #d1d5db; margin-bottom: 1.5rem;">Select your preferred email service to send your message:</p>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <button onclick="openEmailClient('mailto', ${JSON.stringify(contactData).replace(/"/g, '&quot;')})" 
+                                class="email-service-option">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div class="email-service-icon mailto-icon">
+                                    <svg style="width: 1rem; height: 1rem;" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
+                                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+                                    </svg>
+                                </div>
+                                <div class="email-service-info">
+                                    <h3>Send with my Email App</h3>
+                                    <p>Opens your default email client</p>
+                                </div>
+                            </div>
+                            <svg style="width: 1.25rem; height: 1.25rem; color: #9ca3af;" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+
+                        <button onclick="openEmailClient('gmail', ${JSON.stringify(contactData).replace(/"/g, '&quot;')})" 
+                                class="email-service-option">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div class="email-service-icon gmail-icon">G</div>
+                                <div class="email-service-info">
+                                    <h3>Send with Gmail</h3>
+                                    <p>Opens Gmail in a new tab</p>
+                                </div>
+                            </div>
+                            <svg style="width: 1.25rem; height: 1.25rem; color: #9ca3af;" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+
+                        <button onclick="openEmailClient('outlook', ${JSON.stringify(contactData).replace(/"/g, '&quot;')})" 
+                                class="email-service-option">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div class="email-service-icon outlook-icon">O</div>
+                                <div class="email-service-info">
+                                    <h3>Send with Outlook.com</h3>
+                                    <p>Opens Outlook webmail in a new tab</p>
+                                </div>
+                            </div>
+                            <svg style="width: 1.25rem; height: 1.25rem; color: #9ca3af;" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+
+                        <button onclick="openEmailClient('yahoo', ${JSON.stringify(contactData).replace(/"/g, '&quot;')})" 
+                                class="email-service-option">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div class="email-service-icon yahoo-icon">Y</div>
+                                <div class="email-service-info">
+                                    <h3>Send with Yahoo Mail</h3>
+                                    <p>Opens Yahoo webmail in a new tab</p>
+                                </div>
+                            </div>
+                            <svg style="width: 1.25rem; height: 1.25rem; color: #9ca3af;" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // Add escape key listener
+    document.addEventListener('keydown', handleModalEscapeKey);
+}
+
+/**
+ * Close email service modal
+ */
+function closeEmailServiceModal() {
+    const modal = document.getElementById('email-service-modal');
+    if (modal) {
+        modal.remove();
+        // Remove escape key listener
+        document.removeEventListener('keydown', handleModalEscapeKey);
+    }
+}
+
+/**
+ * Handle backdrop click to close modal
+ */
+function handleModalBackdropClick(event) {
+    if (event.target.id === 'email-service-modal') {
+        closeEmailServiceModal();
+    }
+}
+
+/**
+ * Handle escape key to close modal
+ */
+function handleModalEscapeKey(event) {
+    if (event.key === 'Escape' && document.getElementById('email-service-modal')) {
+        closeEmailServiceModal();
+    }
+}
+
+/**
+ * Handle email service selection
+ */
+function openEmailClient(service, contactData) {
+    // Convert subject code to readable format
+    const subjectMap = {
+        'enterprise': 'Enterprise Partnership',
+        'technical': 'Technical Support',
+        'investment': 'Investment Opportunity',
+        'media': 'Media & Press',
+        'general': 'General Inquiry',
+        'other': 'Other'
+    };
+    const subjectText = subjectMap[contactData.subject] || contactData.subject;
+    const subject = encodeURIComponent(`ZKyNet Inquiry: ${subjectText}`);
+    const body = encodeURIComponent(createEmailTemplate(contactData, subjectText));
+    const to = encodeURIComponent('contact@zkynet.org');
+    
+    let url;
+    
+    switch (service) {
+        case 'mailto':
+            url = `mailto:${to}?subject=${subject}&body=${body}`;
+            window.location.href = url;
+            break;
+            
+        case 'gmail':
+            url = `https://mail.google.com/mail/?view=cm&fs=1&to=${to}&su=${subject}&body=${body}`;
+            window.open(url, '_blank');
+            break;
+            
+        case 'outlook':
+            url = `https://outlook.live.com/owa/?path=/mail/action/compose&to=${to}&subject=${subject}&body=${body}`;
+            window.open(url, '_blank');
+            break;
+            
+        case 'yahoo':
+            url = `https://compose.mail.yahoo.com/?to=${to}&subject=${subject}&body=${body}`;
+            window.open(url, '_blank');
+            break;
+    }
+    
+    // Close modal and show success message
+    closeEmailServiceModal();
+    ZKyNet.showSuccessMessage('Opening your email service. Please send the email to complete your inquiry.');
+}
+
+/**
+ * Create structured email template
+ */
+function createEmailTemplate(contactData, subjectText) {
+    return `Hello ZKyNet Team,
+
+My inquiry details:
+
+Name: ${contactData.name}
+${contactData.company ? `Company: ${contactData.company}\n` : ''}
+Message:
+${contactData.message}
+
+Best regards,
+${contactData.name}
+
+---
+This email was generated through the ZKyNet contact form.`;
+}
+
+// Make functions available globally for inline onclick handlers
+window.closeEmailServiceModal = closeEmailServiceModal;
+window.handleModalBackdropClick = handleModalBackdropClick;
+window.openEmailClient = openEmailClient;

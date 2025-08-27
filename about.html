@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About ZKyNet - Privacy Infrastructure with Legal Compliance</title>
+    <meta name="description" content="Learn about ZKyNet's mission to build privacy infrastructure that bridges Tor's anonymity with legal compliance through innovative technology.">
+    <meta name="keywords" content="privacy, zero-knowledge, tor, anonymity, legal compliance, rust, blockchain, about">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="About ZKyNet - Privacy Infrastructure with Legal Compliance">
+    <meta property="og:description" content="Building the next generation of privacy infrastructure that bridges Tor's anonymity with legal compliance">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://zkynet.github.io/about.html">
+    <meta property="og:image" content="assets/images/zkynet-logo-512x512.png">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'zky-blue': '#1e3a8a',
+                        'zky-purple': '#7c3aed',
+                        'zky-dark': '#0f172a',
+                        'zky-light': '#f8fafc'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+</head>
+<body class="bg-zky-dark text-white">
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass-effect">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center space-x-3 nav-link">
+                    <img src="assets/images/zkynet-logo-512x512.png" alt="ZKyNet Logo" class="h-10 w-10">
+                    <span class="text-xl font-bold text-white">ZKyNet™</span>
+                </a>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:block">
+                    <div class="flex items-center space-x-8">
+                        <a href="index.html" class="nav-link text-white hover:text-cyan-400 transition-colors">Home</a>
+                        <a href="about.html" class="nav-link text-cyan-400 hover:text-cyan-400 transition-colors font-semibold">About</a>
+                        <a href="technology.html" class="nav-link text-white hover:text-cyan-400 transition-colors">Technology</a>
+                        <a href="products.html" class="nav-link text-white hover:text-cyan-400 transition-colors">Products</a>
+                        <a href="support.html" class="nav-link text-white hover:text-cyan-400 transition-colors">Support</a>
+                        <a href="contact.html" class="nav-link text-white hover:text-cyan-400 transition-colors">Contact</a>
+                    </div>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="text-white hover:text-cyan-400">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile menu -->
+            <div id="mobile-menu" class="hidden md:hidden pb-4">
+                <div class="flex flex-col space-y-2">
+                    <a href="index.html" class="nav-link text-white hover:text-cyan-400 transition-colors py-2">Home</a>
+                    <a href="about.html" class="nav-link text-cyan-400 hover:text-cyan-400 transition-colors py-2 font-semibold">About</a>
+                    <a href="technology.html" class="nav-link text-white hover:text-cyan-400 transition-colors py-2">Technology</a>
+                    <a href="products.html" class="nav-link text-white hover:text-cyan-400 transition-colors py-2">Products</a>
+                    <a href="support.html" class="nav-link text-white hover:text-cyan-400 transition-colors py-2">Support</a>
+                    <a href="contact.html" class="nav-link text-white hover:text-cyan-400 transition-colors py-2">Contact</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="gradient-bg py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-16">
+                <h1 class="text-4xl md:text-6xl font-bold text-white mb-8">About ZKyNet</h1>
+                <p class="text-xl text-gray-200 max-w-3xl mx-auto">
+                    Building the next generation of privacy infrastructure that bridges Tor's anonymity with legal compliance
+                </p>
+            </div>
+        </section>
+
+        <!-- Mission Section -->
+        <section class="py-20 bg-zky-dark">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h2 class="text-4xl font-bold text-white mb-6">Our Mission</h2>
+                        <p class="text-xl text-gray-300 mb-6">
+                            To create privacy infrastructure that preserves anonymity while meeting corporate and legal compliance requirements.
+                        </p>
+                        <p class="text-lg text-gray-400">
+                            We believe that privacy and legal compliance don't have to be mutually exclusive. Our technology enables organizations to provide privacy-preserving services while maintaining the ability to prevent abuse and meet regulatory requirements.
+                        </p>
+                    </div>
+                    <div class="bg-slate-800 p-8 rounded-xl">
+                        <div class="space-y-6">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-gradient-to-r from-zky-blue to-zky-purple rounded-lg flex items-center justify-center">
+                                    <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-white">Privacy First</h3>
+                                    <p class="text-gray-400">User anonymity is paramount</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-gradient-to-r from-zky-blue to-zky-purple rounded-lg flex items-center justify-center">
+                                    <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-white">Legal Compliance</h3>
+                                    <p class="text-gray-400">Meeting regulatory requirements</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-gradient-to-r from-zky-blue to-zky-purple rounded-lg flex items-center justify-center">
+                                    <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-white">Innovation</h3>
+                                    <p class="text-gray-400">Cutting-edge ZK technology</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Competitive Advantages -->
+        <section class="py-20 bg-slate-900">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-4xl font-bold text-white text-center mb-16">Our Competitive Advantages</h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-gradient-to-r from-zky-blue to-zky-purple rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Legal Compliance</h3>
+                        <p class="text-gray-400 text-sm">Only privacy network with built-in compliance features</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-gradient-to-r from-zky-blue to-zky-purple rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Dynamic Privacy</h3>
+                        <p class="text-gray-400 text-sm">Adaptive security based on real-time risk assessment</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-gradient-to-r from-zky-blue to-zky-purple rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Modern Architecture</h3>
+                        <p class="text-gray-400 text-sm">Rust-based implementation with superior safety</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-gradient-to-r from-zky-blue to-zky-purple rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Enterprise Ready</h3>
+                        <p class="text-gray-400 text-sm">Corporate features from day one</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Success Metrics -->
+        <section class="py-20 bg-zky-dark">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-4xl font-bold text-white text-center mb-16">Success Metrics</h2>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="bg-slate-800 p-8 rounded-xl text-center">
+                        <h3 class="text-2xl font-bold text-white mb-4">Technical Milestones</h3>
+                        <div class="space-y-3 text-gray-300">
+                            <div class="flex items-center justify-between">
+                                <span>ZK proof-of-concept</span>
+                                <div class="w-4 h-4 border-2 border-gray-400 rounded"></div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span>Deploy 10 test nodes</span>
+                                <div class="w-4 h-4 border-2 border-gray-400 rounded"></div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span>Sub-200ms latency</span>
+                                <div class="w-4 h-4 border-2 border-gray-400 rounded"></div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span>1M+ daily transactions</span>
+                                <div class="w-4 h-4 border-2 border-gray-400 rounded"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800 p-8 rounded-xl text-center">
+                        <h3 class="text-2xl font-bold text-white mb-4">Business Milestones</h3>
+                        <div class="space-y-3 text-gray-300">
+                            <div class="flex items-center justify-between">
+                                <span>1,000+ email signups</span>
+                                <div class="w-4 h-4 border-2 border-gray-400 rounded"></div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span>100+ node operators</span>
+                                <div class="w-4 h-4 border-2 border-gray-400 rounded"></div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span>10+ enterprise talks</span>
+                                <div class="w-4 h-4 border-2 border-gray-400 rounded"></div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span>$100K+ commitments</span>
+                                <div class="w-4 h-4 border-2 border-gray-400 rounded"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800 p-8 rounded-xl text-center">
+                        <h3 class="text-2xl font-bold text-white mb-4">Development Milestones</h3>
+                        <div class="space-y-3 text-gray-300">
+                            <div class="flex items-center justify-between">
+                                <span>Landing page</span>
+                                <div class="w-4 h-4 bg-zky-purple border-2 border-zky-purple rounded flex items-center justify-center">
+                                    <svg class="h-2 w-2 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span>Payment integration</span>
+                                <div class="w-4 h-4 border-2 border-gray-400 rounded"></div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span>Documentation portal</span>
+                                <div class="w-4 h-4 border-2 border-gray-400 rounded"></div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span>User onboarding</span>
+                                <div class="w-4 h-4 border-2 border-gray-400 rounded"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-zky-dark py-16 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-3 mb-4">
+                        <img src="assets/images/zkynet-logo-512x512.png" alt="ZKyNet Logo" class="h-8 w-8">
+                        <span class="text-xl font-bold text-white">ZKyNet™</span>
+                    </div>
+                    <p class="text-gray-400 text-sm">
+                        Next-generation privacy infrastructure combining anonymity with legal compliance.
+                    </p>
+                </div>
+                
+                <div>
+                    <h3 class="text-white font-semibold mb-4">Technology</h3>
+                    <ul class="space-y-2">
+                        <li><a href="technology.html" class="text-gray-400 hover:text-white transition-colors">Overview</a></li>
+                        <li><a href="technology.html#zk-proofs" class="text-gray-400 hover:text-white transition-colors">Zero-Knowledge Proofs</a></li>
+                        <li><a href="technology.html#privacy" class="text-gray-400 hover:text-white transition-colors">Dynamic Privacy</a></li>
+                        <li><a href="technology.html#rust" class="text-gray-400 hover:text-white transition-colors">Rust Implementation</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-white font-semibold mb-4">Products</h3>
+                    <ul class="space-y-2">
+                        <li><a href="products.html" class="text-gray-400 hover:text-white transition-colors">Overview</a></li>
+                        <li><a href="products.html#consumer" class="text-gray-400 hover:text-white transition-colors">Consumer VPN</a></li>
+                        <li><a href="products.html#enterprise" class="text-gray-400 hover:text-white transition-colors">Enterprise Solutions</a></li>
+                        <li><a href="products.html#node" class="text-gray-400 hover:text-white transition-colors">Node Operations</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-white font-semibold mb-4">Connect</h3>
+                    <ul class="space-y-2">
+                        <li><a href="contact.html" class="text-gray-400 hover:text-white transition-colors">Contact</a></li>
+                        <li><a href="https://github.com/ZKyNetOfficial" class="text-gray-400 hover:text-white transition-colors" target="_blank">GitHub</a></li>
+                        <li><a href="docs/documentation.html" class="text-gray-400 hover:text-white transition-colors">Documentation</a></li>
+                        <li><a href="https://reddit.com/u/ZKyNetOfficial" class="text-gray-400 hover:text-white transition-colors" target="_blank">Reddit</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-slate-800 mt-12 pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-gray-400 text-sm">
+                        © 2024 ZKyNet. All rights reserved.
+                    </p>
+                    <div class="flex space-x-6 mt-4 md:mt-0">
+                        <a href="legal/privacy-policy.html" class="text-gray-400 hover:text-white text-sm transition-colors">Privacy Policy</a>
+                        <a href="legal/terms-future.html" class="text-gray-400 hover:text-white text-sm transition-colors">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="assets/js/main.js"></script>
+</body>
+</html>
