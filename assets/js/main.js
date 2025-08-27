@@ -98,25 +98,69 @@ class ErrorHandler {
     }
 
     /**
-     * Handle network errors
+     * Handle network errors with improved CORS detection
      */
     handleNetworkError(error, context, details = {}) {
         this.logError(`Network Error - ${context}`, error, details);
 
         let userMessage = 'Network error. Please check your connection and try again.';
+        let errorType = 'network';
         
-        // Provide more specific messages based on error type
-        if (error?.message?.includes('CORS')) {
-            userMessage = 'Connection blocked by security policy. Please contact support.';
+        // Detect CORS issues
+        if (error?.message?.includes('CORS') || 
+            error?.message?.includes('Cross-Origin') ||
+            (error?.message?.includes('Failed to fetch') && this.isLikelyCorsError(details))) {
+            errorType = 'cors';
+            if (this.isLocalDevelopment()) {
+                userMessage = 'CORS blocked: This API call works on the live site but is blocked when running locally. The newsletter form will work when deployed.';
+            } else {
+                userMessage = 'Connection blocked by security policy. Please contact support.';
+            }
         } else if (error?.message?.includes('Failed to fetch')) {
-            userMessage = 'Unable to connect to server. Please check your internet connection.';
+            errorType = 'fetch';
+            userMessage = 'Unable to connect to server. Please check your internet connection or try again later.';
+        } else if (error?.message?.includes('NetworkError')) {
+            errorType = 'network';
+            userMessage = 'Network error occurred. Please check your connection and try again.';
+        } else if (error?.message?.includes('timeout')) {
+            errorType = 'timeout';
+            userMessage = 'Request timed out. Please try again.';
         }
 
+        this.logInfo(context, 'Network error classification', {
+            errorType: errorType,
+            isLocal: this.isLocalDevelopment(),
+            errorMessage: error?.message
+        });
+
         return {
-            type: 'network',
+            type: errorType,
             message: userMessage,
             originalError: error
         };
+    }
+
+    /**
+     * Check if this is likely a CORS error
+     */
+    isLikelyCorsError(details = {}) {
+        // CORS errors typically happen when:
+        // 1. Making requests from localhost to external domains
+        // 2. No response data is available
+        // 3. Specific URL patterns that suggest cross-origin
+        return this.isLocalDevelopment() && 
+               details.url && 
+               !details.url.includes(window.location.hostname);
+    }
+
+    /**
+     * Check if running in local development
+     */
+    isLocalDevelopment() {
+        return window.location.hostname === 'localhost' || 
+               window.location.hostname === '127.0.0.1' ||
+               window.location.hostname.includes('192.168') ||
+               window.location.port !== '';
     }
 
     /**
@@ -377,49 +421,90 @@ async function handleNewsletterSubmission(data) {
         const requestData = { email: data.email };
         const apiUrl = 'https://france-lauterbourg.vpn.zkynet.org/api/support';
         
-        errorHandler.logInfo(context, 'Sending API request', { url: apiUrl, data: requestData });
-
-        // Send email to support API
-        const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestData)
+        errorHandler.logInfo(context, 'Preparing API request', { 
+            url: apiUrl, 
+            data: requestData,
+            origin: window.location.origin,
+            hostname: window.location.hostname,
+            isLocalDev: errorHandler.isLocalDevelopment()
         });
 
-        errorHandler.logInfo(context, 'API response received', { 
-            status: response.status, 
-            statusText: response.statusText,
-            ok: response.ok 
-        });
+        // Create fetch with timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
-        if (response.ok) {
-            try {
-                const result = await response.json();
-                errorHandler.logInfo(context, 'Subscription successful', result);
-            } catch (e) {
-                // JSON parsing failed but response was OK
-                errorHandler.logInfo(context, 'Subscription successful (no JSON response)');
+        try {
+            errorHandler.logInfo(context, 'Sending API request', { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                timeout: '10s'
+            });
+
+            // Send email to support API with timeout
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData),
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+
+            errorHandler.logInfo(context, 'API response received', { 
+                status: response.status, 
+                statusText: response.statusText,
+                ok: response.ok,
+                headers: Object.fromEntries(response.headers.entries()),
+                url: response.url
+            });
+
+            if (response.ok) {
+                try {
+                    const result = await response.json();
+                    errorHandler.logInfo(context, 'Subscription successful', result);
+                } catch (e) {
+                    // JSON parsing failed but response was OK
+                    errorHandler.logInfo(context, 'Subscription successful (no JSON response)');
+                }
+                
+                errorHandler.showUserSuccess('Successfully subscribed to our newsletter! You\'ll be the first to know about ZKyNet updates.');
+                
+                // Clear the form
+                document.querySelector('#newsletter-form').reset();
+            } else {
+                // Handle API errors using unified system
+                const errorInfo = await errorHandler.handleApiError(response, context);
+                errorHandler.showUserError(errorInfo.message);
+            }
+
+        } catch (fetchError) {
+            clearTimeout(timeoutId);
+            
+            // Handle abort/timeout errors specifically
+            if (fetchError.name === 'AbortError') {
+                errorHandler.logError(context, new Error('Request timeout'), { timeout: '10s' });
+                errorHandler.showUserError('Request timed out. Please try again.');
+                return;
             }
             
-            errorHandler.showUserSuccess('Successfully subscribed to our newsletter! You\'ll be the first to know about ZKyNet updates.');
-            
-            // Clear the form
-            document.querySelector('#newsletter-form').reset();
-        } else {
-            // Handle API errors using unified system
-            const errorInfo = await errorHandler.handleApiError(response, context);
+            // Handle network errors using unified system
+            const errorInfo = errorHandler.handleNetworkError(fetchError, context, {
+                email: data.email ? 'provided' : 'missing',
+                url: apiUrl,
+                isLocalDev: errorHandler.isLocalDevelopment()
+            });
             errorHandler.showUserError(errorInfo.message);
         }
 
     } catch (error) {
-        // Handle network errors using unified system
-        const errorInfo = errorHandler.handleNetworkError(error, context, {
-            email: data.email ? 'provided' : 'missing',
-            url: 'https://france-lauterbourg.vpn.zkynet.org/api/support'
+        // Handle any other errors
+        errorHandler.logError(context, error, { 
+            step: 'general_error',
+            email: data.email ? 'provided' : 'missing' 
         });
-        errorHandler.showUserError(errorInfo.message);
+        errorHandler.showUserError('An unexpected error occurred. Please try again.');
     } finally {
         // Reset button state
         if (submitButton) {
