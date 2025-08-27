@@ -14,25 +14,34 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeContactForm() {
     const contactForm = document.querySelector('#contact-form');
     if (contactForm) {
-        ZKyNet.handleFormSubmission(contactForm, handleContactForm);
+        ZKyNet.handleFormSubmission(contactForm, handleContactForm, {
+            context: 'Contact Form',
+            handleErrors: false  // Let contact form handle its own errors
+        });
     }
 }
 
 /**
- * Handle contact form submission
+ * Handle contact form submission with unified error system
  */
 async function handleContactForm(data) {
+    const context = 'Contact Form';
+    const submitButton = document.querySelector('#contact-form button[type="submit"]');
+    const originalText = submitButton ? submitButton.textContent : '';
+    
     try {
-        // Show loading state
-        const submitButton = document.querySelector('#contact-form button[type="submit"]');
-        const originalText = submitButton ? submitButton.textContent : '';
+        ZKyNet.errorHandler.logInfo(context, 'Starting contact form submission', { 
+            hasName: !!(data.firstName && data.lastName),
+            hasSubject: !!data.subject,
+            hasMessage: !!data.message 
+        });
         
+        // Show loading state
         if (submitButton) {
             submitButton.textContent = 'Processing...';
             submitButton.disabled = true;
         }
 
-        
         // Prepare the contact form data
         const contactData = {
             name: `${data.firstName} ${data.lastName}`.trim(),
@@ -41,18 +50,28 @@ async function handleContactForm(data) {
             message: data.message
         };
         
+        ZKyNet.errorHandler.logInfo(context, 'Contact data prepared', { 
+            name: contactData.name,
+            hasCompany: !!contactData.company,
+            subject: contactData.subject 
+        });
+        
         // Show email service selection modal
         showEmailServiceModal(contactData);
         
         // Clear the form
         document.querySelector('#contact-form').reset();
+        
+        ZKyNet.errorHandler.logInfo(context, 'Contact form submission completed successfully');
 
     } catch (error) {
-        console.error('Contact form error:', error);
-        ZKyNet.showErrorMessage('Network error. Please check your connection and try again.');
+        const errorInfo = ZKyNet.errorHandler.handleNetworkError(error, context, {
+            formData: Object.keys(data),
+            step: 'form_processing'
+        });
+        ZKyNet.errorHandler.showUserError(errorInfo.message);
     } finally {
         // Reset button state
-        const submitButton = document.querySelector('#contact-form button[type="submit"]');
         if (submitButton) {
             submitButton.textContent = originalText || 'Send Message';
             submitButton.disabled = false;
@@ -183,50 +202,72 @@ function handleModalEscapeKey(event) {
 }
 
 /**
- * Handle email service selection
+ * Handle email service selection with unified error handling
  */
 function openEmailClient(service, contactData) {
-    // Convert subject code to readable format
-    const subjectMap = {
-        'enterprise': 'Enterprise Partnership',
-        'technical': 'Technical Support',
-        'investment': 'Investment Opportunity',
-        'media': 'Media & Press',
-        'general': 'General Inquiry',
-        'other': 'Other'
-    };
-    const subjectText = subjectMap[contactData.subject] || contactData.subject;
-    const subject = encodeURIComponent(`ZKyNet Inquiry: ${subjectText}`);
-    const body = encodeURIComponent(createEmailTemplate(contactData, subjectText));
-    const to = encodeURIComponent('contact@zkynet.org');
+    const context = 'Email Service Selection';
     
-    let url;
-    
-    switch (service) {
-        case 'mailto':
-            url = `mailto:${to}?subject=${subject}&body=${body}`;
-            window.location.href = url;
-            break;
-            
-        case 'gmail':
-            url = `https://mail.google.com/mail/?view=cm&fs=1&to=${to}&su=${subject}&body=${body}`;
-            window.open(url, '_blank');
-            break;
-            
-        case 'outlook':
-            url = `https://outlook.live.com/owa/?path=/mail/action/compose&to=${to}&subject=${subject}&body=${body}`;
-            window.open(url, '_blank');
-            break;
-            
-        case 'yahoo':
-            url = `https://compose.mail.yahoo.com/?to=${to}&subject=${subject}&body=${body}`;
-            window.open(url, '_blank');
-            break;
+    try {
+        ZKyNet.errorHandler.logInfo(context, 'Opening email client', { 
+            service: service,
+            subject: contactData.subject,
+            hasName: !!contactData.name 
+        });
+        
+        // Convert subject code to readable format
+        const subjectMap = {
+            'enterprise': 'Enterprise Partnership',
+            'technical': 'Technical Support',
+            'investment': 'Investment Opportunity',
+            'media': 'Media & Press',
+            'general': 'General Inquiry',
+            'other': 'Other'
+        };
+        const subjectText = subjectMap[contactData.subject] || contactData.subject;
+        const subject = encodeURIComponent(`ZKyNet Inquiry: ${subjectText}`);
+        const body = encodeURIComponent(createEmailTemplate(contactData, subjectText));
+        const to = encodeURIComponent('contact@zkynet.org');
+        
+        let url;
+        
+        switch (service) {
+            case 'mailto':
+                url = `mailto:${to}?subject=${subject}&body=${body}`;
+                window.location.href = url;
+                break;
+                
+            case 'gmail':
+                url = `https://mail.google.com/mail/?view=cm&fs=1&to=${to}&su=${subject}&body=${body}`;
+                window.open(url, '_blank');
+                break;
+                
+            case 'outlook':
+                url = `https://outlook.live.com/owa/?path=/mail/action/compose&to=${to}&subject=${subject}&body=${body}`;
+                window.open(url, '_blank');
+                break;
+                
+            case 'yahoo':
+                url = `https://compose.mail.yahoo.com/?to=${to}&subject=${subject}&body=${body}`;
+                window.open(url, '_blank');
+                break;
+                
+            default:
+                throw new Error(`Unknown email service: ${service}`);
+        }
+        
+        ZKyNet.errorHandler.logInfo(context, 'Email client opened successfully', { service: service });
+        
+        // Close modal and show success message
+        closeEmailServiceModal();
+        ZKyNet.errorHandler.showUserSuccess('Opening your email service. Please send the email to complete your inquiry.');
+        
+    } catch (error) {
+        ZKyNet.errorHandler.logError(context, error, { 
+            service: service,
+            contactData: { subject: contactData.subject, hasName: !!contactData.name }
+        });
+        ZKyNet.errorHandler.showUserError('Failed to open email client. Please try a different service or contact us directly.');
     }
-    
-    // Close modal and show success message
-    closeEmailServiceModal();
-    ZKyNet.showSuccessMessage('Opening your email service. Please send the email to complete your inquiry.');
 }
 
 /**

@@ -3,6 +3,159 @@
  * Core functionality and navigation
  */
 
+/**
+ * Unified Error Handler and Logging System
+ */
+class ErrorHandler {
+    constructor() {
+        this.isDebugMode = this.detectDebugMode();
+        this.logPrefix = '[ZKyNet]';
+    }
+
+    /**
+     * Detect if we're in debug/development mode
+     */
+    detectDebugMode() {
+        return window.location.hostname === 'localhost' || 
+               window.location.hostname === '127.0.0.1' ||
+               window.location.hostname.includes('192.168') ||
+               window.location.search.includes('debug=true');
+    }
+
+    /**
+     * Centralized error logging
+     */
+    logError(context, error, details = {}) {
+        const errorInfo = {
+            timestamp: new Date().toISOString(),
+            context: context,
+            error: {
+                message: error?.message || error,
+                stack: error?.stack,
+                name: error?.name
+            },
+            details: details,
+            userAgent: navigator.userAgent,
+            url: window.location.href
+        };
+
+        // Always log to console in debug mode
+        if (this.isDebugMode) {
+            console.group(`${this.logPrefix} Error in ${context}`);
+            console.error('Error:', error);
+            console.log('Details:', details);
+            console.log('Full Error Info:', errorInfo);
+            console.groupEnd();
+        } else {
+            // In production, log minimal info
+            console.error(`${this.logPrefix} ${context}:`, error?.message || error);
+        }
+
+        // In the future, this could send to an error tracking service
+        // this.sendToErrorTracking(errorInfo);
+    }
+
+    /**
+     * Log general information
+     */
+    logInfo(context, message, data = {}) {
+        if (this.isDebugMode) {
+            console.log(`${this.logPrefix} [${context}]`, message, data);
+        }
+    }
+
+    /**
+     * Handle API errors with standardized parsing
+     */
+    async handleApiError(response, context) {
+        let errorData = {};
+        let errorMessage = 'An unexpected error occurred';
+
+        try {
+            // Try to parse JSON error response
+            errorData = await response.json();
+            errorMessage = errorData.detail || errorData.message || errorMessage;
+        } catch (e) {
+            // If JSON parsing fails, use status text
+            errorMessage = response.statusText || errorMessage;
+        }
+
+        const details = {
+            status: response.status,
+            statusText: response.statusText,
+            url: response.url,
+            errorData: errorData
+        };
+
+        this.logError(`API Error - ${context}`, new Error(errorMessage), details);
+
+        // Return standardized error response
+        return {
+            status: response.status,
+            message: this.getStatusMessage(response.status, errorMessage),
+            details: errorData
+        };
+    }
+
+    /**
+     * Handle network errors
+     */
+    handleNetworkError(error, context, details = {}) {
+        this.logError(`Network Error - ${context}`, error, details);
+
+        let userMessage = 'Network error. Please check your connection and try again.';
+        
+        // Provide more specific messages based on error type
+        if (error?.message?.includes('CORS')) {
+            userMessage = 'Connection blocked by security policy. Please contact support.';
+        } else if (error?.message?.includes('Failed to fetch')) {
+            userMessage = 'Unable to connect to server. Please check your internet connection.';
+        }
+
+        return {
+            type: 'network',
+            message: userMessage,
+            originalError: error
+        };
+    }
+
+    /**
+     * Get user-friendly status messages
+     */
+    getStatusMessage(status, defaultMessage) {
+        const statusMessages = {
+            400: 'Please check your input and try again.',
+            401: 'Authentication required. Please refresh the page.',
+            403: 'Access denied. You don\'t have permission for this action.',
+            404: 'Service not found. Please try again later.',
+            429: 'Too many requests. Please wait a moment before trying again.',
+            500: 'Server error. Please try again later.',
+            502: 'Service temporarily unavailable. Please try again later.',
+            503: 'Service maintenance in progress. Please try again later.'
+        };
+
+        return statusMessages[status] || defaultMessage;
+    }
+
+    /**
+     * Show user-friendly error message
+     */
+    showUserError(message, type = 'error') {
+        // Use existing notification system
+        showNotification(message, type);
+    }
+
+    /**
+     * Show user-friendly success message
+     */
+    showUserSuccess(message) {
+        showNotification(message, 'success');
+    }
+}
+
+// Create global error handler instance
+const errorHandler = new ErrorHandler();
+
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     initializeNavigation();
@@ -162,20 +315,29 @@ function showNotification(message, type = 'success') {
 }
 
 /**
- * Form submission handler
+ * Form submission handler with unified error management
  */
-function handleFormSubmission(form, handler) {
+function handleFormSubmission(form, handler, options = {}) {
+    const { context = 'Form Submission', handleErrors = true } = options;
+    
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const formData = new FormData(this);
         const data = Object.fromEntries(formData.entries());
         
+        errorHandler.logInfo(context, 'Form submitted', { formId: form.id, data: Object.keys(data) });
+        
         try {
             await handler(data);
         } catch (error) {
-            console.error('Form submission error:', error);
-            showErrorMessage('An error occurred. Please try again.');
+            if (handleErrors) {
+                errorHandler.logError(context, error, { formId: form.id, data: Object.keys(data) });
+                errorHandler.showUserError('An error occurred. Please try again.');
+            } else {
+                // Let the handler manage its own errors
+                throw error;
+            }
         }
     });
 }
@@ -186,61 +348,85 @@ function handleFormSubmission(form, handler) {
 function initializeNewsletterForm() {
     const newsletterForm = document.querySelector('#newsletter-form');
     if (newsletterForm) {
-        handleFormSubmission(newsletterForm, handleNewsletterSubmission);
+        // Disable generic error handling for newsletter form since we handle it specifically
+        handleFormSubmission(newsletterForm, handleNewsletterSubmission, {
+            context: 'Newsletter Subscription',
+            handleErrors: false
+        });
     }
 }
 
 /**
- * Handle newsletter form submission
+ * Handle newsletter form submission with unified error system
  */
 async function handleNewsletterSubmission(data) {
+    const context = 'Newsletter Subscription';
+    const submitButton = document.querySelector('#newsletter-form button[type="submit"]');
+    const originalText = submitButton ? submitButton.textContent : '';
+    
     try {
-        // Show loading state
-        const submitButton = document.querySelector('#newsletter-form button[type="submit"]');
-        const originalText = submitButton ? submitButton.textContent : '';
+        errorHandler.logInfo(context, 'Starting newsletter subscription', { email: data.email.substring(0, 5) + '...' });
         
+        // Show loading state
         if (submitButton) {
             submitButton.textContent = 'Subscribing...';
             submitButton.disabled = true;
         }
 
+        // Prepare request
+        const requestData = { email: data.email };
+        const apiUrl = 'https://france-lauterbourg.vpn.zkynet.org/api/support';
+        
+        errorHandler.logInfo(context, 'Sending API request', { url: apiUrl, data: requestData });
+
         // Send email to support API
-        const response = await fetch('https://france-lauterbourg.vpn.zkynet.org/api/support', {
+        const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email: data.email })
+            body: JSON.stringify(requestData)
+        });
+
+        errorHandler.logInfo(context, 'API response received', { 
+            status: response.status, 
+            statusText: response.statusText,
+            ok: response.ok 
         });
 
         if (response.ok) {
-            const result = await response.json();
-            showSuccessMessage('Successfully subscribed to our newsletter! You\'ll be the first to know about ZKyNet updates.');
+            try {
+                const result = await response.json();
+                errorHandler.logInfo(context, 'Subscription successful', result);
+            } catch (e) {
+                // JSON parsing failed but response was OK
+                errorHandler.logInfo(context, 'Subscription successful (no JSON response)');
+            }
+            
+            errorHandler.showUserSuccess('Successfully subscribed to our newsletter! You\'ll be the first to know about ZKyNet updates.');
             
             // Clear the form
             document.querySelector('#newsletter-form').reset();
         } else {
-            const errorData = await response.json().catch(() => ({}));
-            
-            if (response.status === 429) {
-                showErrorMessage('Too many requests. Please wait a moment before trying again.');
-            } else if (response.status === 400) {
-                showErrorMessage(errorData.detail || 'Please enter a valid email address.');
-            } else {
-                showErrorMessage('Failed to subscribe. Please try again later.');
-            }
+            // Handle API errors using unified system
+            const errorInfo = await errorHandler.handleApiError(response, context);
+            errorHandler.showUserError(errorInfo.message);
         }
 
     } catch (error) {
-        console.error('Newsletter subscription error:', error);
-        showErrorMessage('Network error. Please check your connection and try again.');
+        // Handle network errors using unified system
+        const errorInfo = errorHandler.handleNetworkError(error, context, {
+            email: data.email ? 'provided' : 'missing',
+            url: 'https://france-lauterbourg.vpn.zkynet.org/api/support'
+        });
+        errorHandler.showUserError(errorInfo.message);
     } finally {
         // Reset button state
-        const submitButton = document.querySelector('#newsletter-form button[type="submit"]');
         if (submitButton) {
             submitButton.textContent = originalText || 'Subscribe';
             submitButton.disabled = false;
         }
+        errorHandler.logInfo(context, 'Newsletter submission completed');
     }
 }
 
@@ -251,5 +437,6 @@ window.ZKyNet = {
     showNotification,
     handleFormSubmission,
     getCurrentPage,
-    updateActiveNavLink
+    updateActiveNavLink,
+    errorHandler: errorHandler  // Export unified error handler
 };
