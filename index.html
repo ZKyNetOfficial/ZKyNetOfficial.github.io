@@ -2072,27 +2072,15 @@
 My inquiry details:
 
 Name: ${contactData.name}
-${contactData.company ? `Company: ${contactData.company}\n` : ''}Subject: ${subjectText || contactData.subject}
-
+${contactData.company ? `Company: ${contactData.company}\n` : ''}
 Message:
 ${contactData.message}
-
----
-Please structure your response as follows:
-
-1. **Issue Assessment**: Brief summary of my inquiry
-2. **Solution/Response**: Your recommendations or answers
-3. **Next Steps**: Any actions required from either party
-4. **Timeline**: Expected response or resolution timeframe
-
-Thank you for your time and consideration.
 
 Best regards,
 ${contactData.name}
 
 ---
-This email was generated through the ZKyNet contact form.
-Please reply to the sender's email address for all correspondence.`;
+This email was generated through the ZKyNet contact form.`;
         }
 
         function showSuccessMessage(message) {
