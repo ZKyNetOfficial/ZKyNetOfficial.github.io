@@ -195,6 +195,205 @@ class ErrorHandler {
     showUserSuccess(message) {
         showNotification(message, 'success');
     }
+
+    /**
+     * API Diagnostic Functions
+     */
+    
+    /**
+     * Test API health endpoint
+     */
+    async testApiHealth() {
+        const context = 'API Health Check';
+        const healthUrl = 'https://france-lauterbourg.vpn.zkynet.org/api/health';
+        
+        try {
+            this.logInfo(context, 'Testing API health endpoint', { url: healthUrl });
+            
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            
+            const response = await fetch(healthUrl, {
+                method: 'GET',
+                signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            
+            const result = {
+                success: response.ok,
+                status: response.status,
+                statusText: response.statusText,
+                headers: Object.fromEntries(response.headers.entries()),
+                url: response.url
+            };
+            
+            if (response.ok) {
+                try {
+                    result.data = await response.json();
+                } catch (e) {
+                    result.data = 'Non-JSON response';
+                }
+            }
+            
+            this.logInfo(context, 'Health check completed', result);
+            return result;
+            
+        } catch (error) {
+            const errorInfo = {
+                success: false,
+                error: error.message,
+                name: error.name,
+                type: this.classifyConnectionError(error)
+            };
+            
+            this.logError(context, error);
+            return errorInfo;
+        }
+    }
+
+    /**
+     * Test CORS preflight request
+     */
+    async testCorsPreFlight() {
+        const context = 'CORS Preflight Test';
+        const apiUrl = 'https://france-lauterbourg.vpn.zkynet.org/api/support';
+        
+        try {
+            this.logInfo(context, 'Testing CORS preflight', { url: apiUrl });
+            
+            // Make an OPTIONS request to test CORS
+            const response = await fetch(apiUrl, {
+                method: 'OPTIONS',
+                headers: {
+                    'Access-Control-Request-Method': 'POST',
+                    'Access-Control-Request-Headers': 'Content-Type',
+                    'Origin': window.location.origin
+                }
+            });
+            
+            const corsHeaders = {
+                'access-control-allow-origin': response.headers.get('access-control-allow-origin'),
+                'access-control-allow-methods': response.headers.get('access-control-allow-methods'),
+                'access-control-allow-headers': response.headers.get('access-control-allow-headers'),
+                'access-control-max-age': response.headers.get('access-control-max-age')
+            };
+            
+            const result = {
+                success: response.ok,
+                status: response.status,
+                corsHeaders: corsHeaders,
+                allHeaders: Object.fromEntries(response.headers.entries())
+            };
+            
+            this.logInfo(context, 'CORS preflight completed', result);
+            return result;
+            
+        } catch (error) {
+            this.logError(context, error);
+            return {
+                success: false,
+                error: error.message,
+                type: this.classifyConnectionError(error)
+            };
+        }
+    }
+
+    /**
+     * Test the actual support API endpoint
+     */
+    async testSupportApi(testEmail = 'test@example.com') {
+        const context = 'Support API Test';
+        const apiUrl = 'https://france-lauterbourg.vpn.zkynet.org/api/support';
+        
+        try {
+            this.logInfo(context, 'Testing support API endpoint', { url: apiUrl, email: testEmail });
+            
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
+            
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: testEmail }),
+                signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            
+            const result = {
+                success: response.ok,
+                status: response.status,
+                statusText: response.statusText,
+                headers: Object.fromEntries(response.headers.entries()),
+                url: response.url
+            };
+            
+            try {
+                result.data = await response.json();
+            } catch (e) {
+                result.data = 'Non-JSON response';
+            }
+            
+            this.logInfo(context, 'Support API test completed', result);
+            return result;
+            
+        } catch (error) {
+            this.logError(context, error);
+            return {
+                success: false,
+                error: error.message,
+                name: error.name,
+                type: this.classifyConnectionError(error)
+            };
+        }
+    }
+
+    /**
+     * Classify connection errors
+     */
+    classifyConnectionError(error) {
+        if (error.name === 'AbortError') return 'timeout';
+        if (error.message?.includes('CORS')) return 'cors';
+        if (error.message?.includes('Failed to fetch')) return 'network';
+        if (error.message?.includes('NetworkError')) return 'network';
+        if (error.message?.includes('DNS')) return 'dns';
+        if (error.message?.includes('SSL') || error.message?.includes('TLS')) return 'ssl';
+        return 'unknown';
+    }
+
+    /**
+     * Run comprehensive API diagnostics
+     */
+    async runApiDiagnostics() {
+        this.logInfo('API Diagnostics', 'Starting comprehensive API tests');
+        
+        const results = {
+            timestamp: new Date().toISOString(),
+            environment: {
+                origin: window.location.origin,
+                hostname: window.location.hostname,
+                isLocal: this.isLocalDevelopment(),
+                userAgent: navigator.userAgent
+            },
+            tests: {}
+        };
+        
+        // Test 1: Health endpoint
+        results.tests.health = await this.testApiHealth();
+        
+        // Test 2: CORS preflight
+        results.tests.cors = await this.testCorsPreFlight();
+        
+        // Test 3: Support API
+        results.tests.support = await this.testSupportApi();
+        
+        this.logInfo('API Diagnostics', 'All tests completed', results);
+        
+        return results;
+    }
 }
 
 // Create global error handler instance
@@ -206,6 +405,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeMobileMenu();
     initializeSmoothScrolling();
     initializeNewsletterForm();
+    initializeDebugMode();
 });
 
 /**
@@ -513,6 +713,170 @@ async function handleNewsletterSubmission(data) {
         }
         errorHandler.logInfo(context, 'Newsletter submission completed');
     }
+}
+
+/**
+ * Debug Mode Functions
+ */
+
+/**
+ * Initialize debug mode if enabled
+ */
+function initializeDebugMode() {
+    if (errorHandler.isDebugMode || window.location.search.includes('debug=true')) {
+        createDebugPanel();
+        enableGlobalDebugFunctions();
+    }
+}
+
+/**
+ * Create debug panel in the page
+ */
+function createDebugPanel() {
+    const debugPanel = document.createElement('div');
+    debugPanel.id = 'zkynet-debug-panel';
+    debugPanel.innerHTML = `
+        <div style="position: fixed; top: 10px; right: 10px; z-index: 10000; background: rgba(0,0,0,0.9); color: white; padding: 15px; border-radius: 8px; max-width: 400px; font-family: monospace; font-size: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h3 style="margin: 0; color: #7c3aed;">ZKyNet API Debug</h3>
+                <button onclick="document.getElementById('zkynet-debug-panel').remove()" style="background: none; border: none; color: white; font-size: 16px; cursor: pointer;">×</button>
+            </div>
+            <div id="debug-status" style="margin-bottom: 10px; color: #fbbf24;">Initializing...</div>
+            <button onclick="runApiDiagnostics()" style="background: #7c3aed; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; margin-right: 5px;">Test API</button>
+            <button onclick="testNewsletterForm()" style="background: #059669; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; margin-right: 5px;">Test Form</button>
+            <button onclick="clearDebugLogs()" style="background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">Clear Logs</button>
+            <div id="debug-results" style="margin-top: 10px; max-height: 300px; overflow-y: auto; background: rgba(255,255,255,0.1); padding: 8px; border-radius: 4px; white-space: pre-wrap; font-size: 10px;"></div>
+        </div>
+    `;
+    
+    document.body.appendChild(debugPanel);
+    
+    // Auto-run diagnostics
+    setTimeout(() => runApiDiagnostics(), 1000);
+}
+
+/**
+ * Run API diagnostics and display results
+ */
+async function runApiDiagnostics() {
+    const statusDiv = document.getElementById('debug-status');
+    const resultsDiv = document.getElementById('debug-results');
+    
+    if (statusDiv) statusDiv.textContent = 'Running API diagnostics...';
+    if (resultsDiv) resultsDiv.textContent = 'Testing API endpoints...\n\n';
+    
+    try {
+        const results = await errorHandler.runApiDiagnostics();
+        
+        let output = `=== API DIAGNOSTICS RESULTS ===\n`;
+        output += `Time: ${results.timestamp}\n`;
+        output += `Environment: ${results.environment.origin}\n`;
+        output += `Is Local: ${results.environment.isLocal}\n\n`;
+        
+        // Health test results
+        output += `📊 HEALTH CHECK:\n`;
+        if (results.tests.health.success) {
+            output += `✅ SUCCESS (${results.tests.health.status})\n`;
+            output += `Data: ${JSON.stringify(results.tests.health.data, null, 2)}\n`;
+        } else {
+            output += `❌ FAILED (${results.tests.health.type})\n`;
+            output += `Error: ${results.tests.health.error}\n`;
+        }
+        output += `\n`;
+        
+        // CORS test results  
+        output += `🔒 CORS PREFLIGHT:\n`;
+        if (results.tests.cors.success) {
+            output += `✅ SUCCESS (${results.tests.cors.status})\n`;
+            output += `CORS Headers:\n${JSON.stringify(results.tests.cors.corsHeaders, null, 2)}\n`;
+        } else {
+            output += `❌ FAILED (${results.tests.cors.type})\n`;
+            output += `Error: ${results.tests.cors.error}\n`;
+        }
+        output += `\n`;
+        
+        // Support API test results
+        output += `📧 SUPPORT API:\n`;
+        if (results.tests.support.success) {
+            output += `✅ SUCCESS (${results.tests.support.status})\n`;
+            output += `Data: ${JSON.stringify(results.tests.support.data, null, 2)}\n`;
+        } else {
+            output += `❌ FAILED (${results.tests.support.type})\n`;
+            output += `Error: ${results.tests.support.error}\n`;
+        }
+        
+        if (resultsDiv) resultsDiv.textContent = output;
+        
+        // Update status
+        const healthOk = results.tests.health.success;
+        const corsOk = results.tests.cors.success;
+        const supportOk = results.tests.support.success;
+        
+        let statusMsg = '';
+        if (healthOk && corsOk && supportOk) {
+            statusMsg = '✅ All tests passed - API is working';
+        } else if (!healthOk) {
+            statusMsg = '❌ Health check failed - Server/DNS issue';
+        } else if (!corsOk) {
+            statusMsg = '❌ CORS issue - Server config problem';
+        } else if (!supportOk) {
+            statusMsg = '❌ Support API failed - Endpoint issue';
+        } else {
+            statusMsg = '⚠️ Mixed results - Check logs';
+        }
+        
+        if (statusDiv) statusDiv.textContent = statusMsg;
+        
+    } catch (error) {
+        if (resultsDiv) resultsDiv.textContent = `ERROR: ${error.message}`;
+        if (statusDiv) statusDiv.textContent = '❌ Diagnostic test failed';
+    }
+}
+
+/**
+ * Test the newsletter form with debug output
+ */
+async function testNewsletterForm() {
+    const resultsDiv = document.getElementById('debug-results');
+    if (resultsDiv) resultsDiv.textContent = 'Testing newsletter form...\n\n';
+    
+    try {
+        const testData = { email: 'debug-test@example.com', terms: 'on' };
+        await handleNewsletterSubmission(testData);
+        
+        if (resultsDiv) resultsDiv.textContent += '\n✅ Newsletter form test completed - check console for details';
+    } catch (error) {
+        if (resultsDiv) resultsDiv.textContent += `\n❌ Newsletter form test failed: ${error.message}`;
+    }
+}
+
+/**
+ * Clear debug logs
+ */
+function clearDebugLogs() {
+    const resultsDiv = document.getElementById('debug-results');
+    if (resultsDiv) resultsDiv.textContent = '';
+    console.clear();
+}
+
+/**
+ * Enable global debug functions
+ */
+function enableGlobalDebugFunctions() {
+    // Make debug functions available globally
+    window.runApiDiagnostics = runApiDiagnostics;
+    window.testNewsletterForm = testNewsletterForm;
+    window.clearDebugLogs = clearDebugLogs;
+    window.ZKyNetDebug = {
+        testHealth: () => errorHandler.testApiHealth(),
+        testCors: () => errorHandler.testCorsPreFlight(),
+        testSupport: (email) => errorHandler.testSupportApi(email),
+        runDiagnostics: () => errorHandler.runApiDiagnostics()
+    };
+    
+    console.log('🔧 ZKyNet Debug Mode Enabled');
+    console.log('Available functions:', Object.keys(window.ZKyNetDebug));
+    console.log('Add ?debug=true to URL to show debug panel');
 }
 
 // Export functions for use in other modules
