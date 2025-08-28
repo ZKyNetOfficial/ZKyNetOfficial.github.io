@@ -4,7 +4,7 @@
  */
 
 // Initialize contact form when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
     initializeContactForm();
 });
 
@@ -16,7 +16,7 @@ function initializeContactForm() {
     if (contactForm) {
         ZKyNet.handleFormSubmission(contactForm, handleContactForm, {
             context: 'Contact Form',
-            handleErrors: false  // Let contact form handle its own errors
+            handleErrors: false // Let contact form handle its own errors
         });
     }
 }
@@ -28,14 +28,14 @@ async function handleContactForm(data) {
     const context = 'Contact Form';
     const submitButton = document.querySelector('#contact-form button[type="submit"]');
     const originalText = submitButton ? submitButton.textContent : '';
-    
+
     try {
-        ZKyNet.errorHandler.logInfo(context, 'Starting contact form submission', { 
+        ZKyNet.errorHandler.logInfo(context, 'Starting contact form submission', {
             hasName: !!(data.firstName && data.lastName),
             hasSubject: !!data.subject,
-            hasMessage: !!data.message 
+            hasMessage: !!data.message
         });
-        
+
         // Show loading state
         if (submitButton) {
             submitButton.textContent = 'Processing...';
@@ -49,21 +49,20 @@ async function handleContactForm(data) {
             subject: data.subject,
             message: data.message
         };
-        
-        ZKyNet.errorHandler.logInfo(context, 'Contact data prepared', { 
+
+        ZKyNet.errorHandler.logInfo(context, 'Contact data prepared', {
             name: contactData.name,
             hasCompany: !!contactData.company,
-            subject: contactData.subject 
+            subject: contactData.subject
         });
-        
+
         // Show email service selection modal
         showEmailServiceModal(contactData);
-        
+
         // Clear the form
         document.querySelector('#contact-form').reset();
-        
-        ZKyNet.errorHandler.logInfo(context, 'Contact form submission completed successfully');
 
+        ZKyNet.errorHandler.logInfo(context, 'Contact form submission completed successfully');
     } catch (error) {
         const errorInfo = ZKyNet.errorHandler.handleNetworkError(error, context, {
             formData: Object.keys(data),
@@ -164,9 +163,9 @@ function showEmailServiceModal(contactData) {
             </div>
         </div>
     `;
-    
+
     document.body.insertAdjacentHTML('beforeend', modalHtml);
-    
+
     // Add escape key listener
     document.addEventListener('keydown', handleModalEscapeKey);
 }
@@ -206,67 +205,72 @@ function handleModalEscapeKey(event) {
  */
 function openEmailClient(service, contactData) {
     const context = 'Email Service Selection';
-    
+
     try {
-        ZKyNet.errorHandler.logInfo(context, 'Opening email client', { 
+        ZKyNet.errorHandler.logInfo(context, 'Opening email client', {
             service: service,
             subject: contactData.subject,
-            hasName: !!contactData.name 
+            hasName: !!contactData.name
         });
-        
+
         // Convert subject code to readable format
         const subjectMap = {
-            'enterprise': 'Enterprise Partnership',
-            'technical': 'Technical Support',
-            'investment': 'Investment Opportunity',
-            'media': 'Media & Press',
-            'general': 'General Inquiry',
-            'other': 'Other'
+            enterprise: 'Enterprise Partnership',
+            technical: 'Technical Support',
+            investment: 'Investment Opportunity',
+            media: 'Media & Press',
+            general: 'General Inquiry',
+            other: 'Other'
         };
         const subjectText = subjectMap[contactData.subject] || contactData.subject;
         const subject = encodeURIComponent(`ZKyNet Inquiry: ${subjectText}`);
         const body = encodeURIComponent(createEmailTemplate(contactData, subjectText));
         const to = encodeURIComponent('contact@zkynet.org');
-        
+
         let url;
-        
+
         switch (service) {
             case 'mailto':
                 url = `mailto:${to}?subject=${subject}&body=${body}`;
                 window.location.href = url;
                 break;
-                
+
             case 'gmail':
                 url = `https://mail.google.com/mail/?view=cm&fs=1&to=${to}&su=${subject}&body=${body}`;
                 window.open(url, '_blank');
                 break;
-                
+
             case 'outlook':
                 url = `https://outlook.live.com/owa/?path=/mail/action/compose&to=${to}&subject=${subject}&body=${body}`;
                 window.open(url, '_blank');
                 break;
-                
+
             case 'yahoo':
                 url = `https://compose.mail.yahoo.com/?to=${to}&subject=${subject}&body=${body}`;
                 window.open(url, '_blank');
                 break;
-                
+
             default:
                 throw new Error(`Unknown email service: ${service}`);
         }
-        
-        ZKyNet.errorHandler.logInfo(context, 'Email client opened successfully', { service: service });
-        
+
+        ZKyNet.errorHandler.logInfo(context, 'Email client opened successfully', {
+            service: service
+        });
+
         // Close modal and show success message
         closeEmailServiceModal();
-        ZKyNet.errorHandler.showUserSuccess('Opening your email service. Please send the email to complete your inquiry.');
-        
+        ZKyNet.errorHandler.showUserSuccess(
+            'Opening your email service. Please send the email to complete your inquiry.'
+        );
     } catch (error) {
-        ZKyNet.errorHandler.logError(context, error, { 
+        ZKyNet.errorHandler.logError(context, error, {
             service: service,
             contactData: { subject: contactData.subject, hasName: !!contactData.name }
         });
-        ZKyNet.errorHandler.showUserError('Failed to open email client. Please try a different service or contact us directly.');
+        ZKyNet.errorHandler.showUserError(
+            'Failed to open email client. Please try a different service or contact us directly.'
+        );
     }
 }
 

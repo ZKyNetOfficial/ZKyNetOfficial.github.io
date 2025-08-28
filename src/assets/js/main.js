@@ -21,12 +21,14 @@ class ErrorHandler {
         if (this.isProductionDomain()) {
             return false;
         }
-        
+
         // Only enable debug mode on explicit localhost or with explicit debug flags
-        return (window.location.hostname === 'localhost' || 
-                window.location.hostname === '127.0.0.1') ||
-               window.location.search.includes('debug=true') ||
-               localStorage.getItem('zkynet-debug') === 'true';
+        return (
+            window.location.hostname === 'localhost'
+            || window.location.hostname === '127.0.0.1'
+            || window.location.search.includes('debug=true')
+            || localStorage.getItem('zkynet-debug') === 'true'
+        );
     }
 
     /**
@@ -37,12 +39,12 @@ class ErrorHandler {
         // Add your production domains here
         const productionDomains = [
             'zkynet.org',
-            'www.zkynet.org',
+            'www.zkynet.org'
             // Add any other production domains
         ];
-        
-        return productionDomains.some(domain => 
-            hostname === domain || hostname.endsWith('.' + domain)
+
+        return productionDomains.some(
+            domain => hostname === domain || hostname.endsWith(`.${domain}`)
         );
     }
 
@@ -127,31 +129,38 @@ class ErrorHandler {
     handleNetworkError(error, context, details = {}) {
         let userMessage = 'Network error. Please check your connection and try again.';
         let errorType = 'network';
-        
+
         // Detect CORS issues with enhanced detection for server misconfigurations
-        const isCorsError = error?.message?.includes('CORS') || 
-                           error?.message?.includes('Cross-Origin') ||
-                           (error?.message?.includes('Failed to fetch') && this.isLikelyCorsError(details));
-        
-        const isServerCorsConfig = error?.message?.includes('multiple values') && error?.message?.includes('Access-Control-Allow-Origin');
-        
+        const isCorsError
+            = error?.message?.includes('CORS')
+            || error?.message?.includes('Cross-Origin') ||
+            (error?.message?.includes('Failed to fetch') && this.isLikelyCorsError(details));
+
+        const isServerCorsConfig
+            = error?.message?.includes('multiple values')
+            && error?.message?.includes('Access-Control-Allow-Origin');
+
         if (isCorsError || isServerCorsConfig) {
             errorType = isCorsError ? 'cors' : 'cors_server_config';
-            
+
             if (isServerCorsConfig) {
                 // Server-side CORS configuration error
-                userMessage = 'Server Configuration Error: The API server has a CORS configuration issue. Please contact the development team to fix the Access-Control-Allow-Origin header format.';
+                userMessage
+                    = 'Server Configuration Error: The API server has a CORS configuration issue. Please contact the development team to fix the Access-Control-Allow-Origin header format.';
             } else if (details.url && details.url.includes('france-lauterbourg.vpn.zkynet.org')) {
                 // Known API CORS issue
-                userMessage = 'Known Server Issue: The API server has a CORS configuration problem (multiple origins in header). This affects all domains until the server is fixed.';
+                userMessage
+                    = 'Known Server Issue: The API server has a CORS configuration problem (multiple origins in header). This affects all domains until the server is fixed.';
             } else if (this.isLocalDevelopment()) {
-                userMessage = 'Development Mode: CORS policy blocks localhost requests to the API. This form works on the live site (zkynet.org). Enable debug mode with ?debug=true to see technical details.';
+                userMessage
+                    = 'Development Mode: CORS policy blocks localhost requests to the API. This form works on the live site (zkynet.org). Enable debug mode with ?debug=true to see technical details.';
             } else {
                 userMessage = 'Connection blocked by security policy. Please contact support.';
             }
         } else if (error?.message?.includes('Failed to fetch')) {
             errorType = 'fetch';
-            userMessage = 'Unable to connect to server. Please check your internet connection or try again later.';
+            userMessage
+                = 'Unable to connect to server. Please check your internet connection or try again later.';
         } else if (error?.message?.includes('NetworkError')) {
             errorType = 'network';
             userMessage = 'Network error occurred. Please check your connection and try again.';
@@ -190,7 +199,7 @@ class ErrorHandler {
         // 1. Making requests from localhost to external domains
         // 2. No response data is available
         // 3. Specific URL patterns that suggest cross-origin
-        
+
         // Enhanced CORS detection for the ZKyNet API case
         if (details.url) {
             // Check for known external API endpoints with CORS issues
@@ -198,13 +207,13 @@ class ErrorHandler {
                 // This API has known CORS server configuration issues
                 return true;
             }
-            
+
             // Check for cross-origin request (different hostname) in dev mode
             if (this.isLocalDevelopment() && !details.url.includes(window.location.hostname)) {
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -212,10 +221,12 @@ class ErrorHandler {
      * Check if running in local development
      */
     isLocalDevelopment() {
-        return window.location.hostname === 'localhost' || 
-               window.location.hostname === '127.0.0.1' ||
-               window.location.hostname.includes('192.168') ||
-               window.location.port !== '';
+        return (
+            window.location.hostname === 'localhost'
+            || window.location.hostname === '127.0.0.1'
+            || window.location.hostname.includes('192.168')
+            || window.location.port !== ''
+        );
     }
 
     /**
@@ -225,7 +236,7 @@ class ErrorHandler {
         const statusMessages = {
             400: 'Please check your input and try again.',
             401: 'Authentication required. Please refresh the page.',
-            403: 'Access denied. You don\'t have permission for this action.',
+            403: "Access denied. You don't have permission for this action.",
             404: 'Service not found. Please try again later.',
             429: 'Too many requests. Please wait a moment before trying again.',
             500: 'Server error. Please try again later.',
@@ -254,27 +265,27 @@ class ErrorHandler {
     /**
      * API Diagnostic Functions
      */
-    
+
     /**
      * Test API health endpoint
      */
     async testApiHealth() {
         const context = 'API Health Check';
         const healthUrl = 'https://france-lauterbourg.vpn.zkynet.org/api/health';
-        
+
         try {
             this.logInfo(context, 'Testing API health endpoint', { url: healthUrl });
-            
+
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 5000);
-            
+
             const response = await fetch(healthUrl, {
                 method: 'GET',
                 signal: controller.signal
             });
-            
+
             clearTimeout(timeoutId);
-            
+
             const result = {
                 success: response.ok,
                 status: response.status,
@@ -282,7 +293,7 @@ class ErrorHandler {
                 headers: Object.fromEntries(response.headers.entries()),
                 url: response.url
             };
-            
+
             if (response.ok) {
                 try {
                     result.data = await response.json();
@@ -290,10 +301,9 @@ class ErrorHandler {
                     result.data = 'Non-JSON response';
                 }
             }
-            
+
             this.logInfo(context, 'Health check completed', result);
             return result;
-            
         } catch (error) {
             const errorInfo = {
                 success: false,
@@ -301,7 +311,7 @@ class ErrorHandler {
                 name: error.name,
                 type: this.classifyConnectionError(error)
             };
-            
+
             this.logError(context, error);
             return errorInfo;
         }
@@ -313,37 +323,40 @@ class ErrorHandler {
     async testCorsPreFlight() {
         const context = 'CORS Preflight Test';
         const apiUrl = 'https://france-lauterbourg.vpn.zkynet.org/api/support';
-        
+
         try {
             this.logInfo(context, 'Testing CORS preflight', { url: apiUrl });
-            
+
             // Make an OPTIONS request to test CORS
             const response = await fetch(apiUrl, {
                 method: 'OPTIONS',
                 headers: {
                     'Access-Control-Request-Method': 'POST',
                     'Access-Control-Request-Headers': 'Content-Type',
-                    'Origin': window.location.origin
+                    Origin: window.location.origin
                 }
             });
-            
+
             const corsHeaders = {
                 'access-control-allow-origin': response.headers.get('access-control-allow-origin'),
-                'access-control-allow-methods': response.headers.get('access-control-allow-methods'),
-                'access-control-allow-headers': response.headers.get('access-control-allow-headers'),
+                'access-control-allow-methods': response.headers.get(
+                    'access-control-allow-methods'
+                ),
+                'access-control-allow-headers': response.headers.get(
+                    'access-control-allow-headers'
+                ),
                 'access-control-max-age': response.headers.get('access-control-max-age')
             };
-            
+
             const result = {
                 success: response.ok,
                 status: response.status,
                 corsHeaders: corsHeaders,
                 allHeaders: Object.fromEntries(response.headers.entries())
             };
-            
+
             this.logInfo(context, 'CORS preflight completed', result);
             return result;
-            
         } catch (error) {
             this.logError(context, error);
             return {
@@ -360,24 +373,27 @@ class ErrorHandler {
     async testSupportApi(testEmail = 'test@example.com') {
         const context = 'Support API Test';
         const apiUrl = 'https://france-lauterbourg.vpn.zkynet.org/api/support';
-        
+
         try {
-            this.logInfo(context, 'Testing support API endpoint', { url: apiUrl, email: testEmail });
-            
+            this.logInfo(context, 'Testing support API endpoint', {
+                url: apiUrl,
+                email: testEmail
+            });
+
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 10000);
-            
+
             const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ email: testEmail }),
                 signal: controller.signal
             });
-            
+
             clearTimeout(timeoutId);
-            
+
             const result = {
                 success: response.ok,
                 status: response.status,
@@ -385,16 +401,15 @@ class ErrorHandler {
                 headers: Object.fromEntries(response.headers.entries()),
                 url: response.url
             };
-            
+
             try {
                 result.data = await response.json();
             } catch (e) {
                 result.data = 'Non-JSON response';
             }
-            
+
             this.logInfo(context, 'Support API test completed', result);
             return result;
-            
         } catch (error) {
             this.logError(context, error);
             return {
@@ -410,12 +425,24 @@ class ErrorHandler {
      * Classify connection errors
      */
     classifyConnectionError(error) {
-        if (error.name === 'AbortError') return 'timeout';
-        if (error.message?.includes('CORS')) return 'cors';
-        if (error.message?.includes('Failed to fetch')) return 'network';
-        if (error.message?.includes('NetworkError')) return 'network';
-        if (error.message?.includes('DNS')) return 'dns';
-        if (error.message?.includes('SSL') || error.message?.includes('TLS')) return 'ssl';
+        if (error.name === 'AbortError') {
+            return 'timeout';
+        }
+        if (error.message?.includes('CORS')) {
+            return 'cors';
+        }
+        if (error.message?.includes('Failed to fetch')) {
+            return 'network';
+        }
+        if (error.message?.includes('NetworkError')) {
+            return 'network';
+        }
+        if (error.message?.includes('DNS')) {
+            return 'dns';
+        }
+        if (error.message?.includes('SSL') || error.message?.includes('TLS')) {
+            return 'ssl';
+        }
         return 'unknown';
     }
 
@@ -424,7 +451,7 @@ class ErrorHandler {
      */
     async runApiDiagnostics() {
         this.logInfo('API Diagnostics', 'Starting comprehensive API tests');
-        
+
         const results = {
             timestamp: new Date().toISOString(),
             environment: {
@@ -435,18 +462,18 @@ class ErrorHandler {
             },
             tests: {}
         };
-        
+
         // Test 1: Health endpoint
         results.tests.health = await this.testApiHealth();
-        
+
         // Test 2: CORS preflight
         results.tests.cors = await this.testCorsPreFlight();
-        
+
         // Test 3: Support API
         results.tests.support = await this.testSupportApi();
-        
+
         this.logInfo('API Diagnostics', 'All tests completed', results);
-        
+
         return results;
     }
 }
@@ -455,7 +482,7 @@ class ErrorHandler {
 const errorHandler = new ErrorHandler();
 
 // Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
     initializeNavigation();
     initializeMobileMenu();
     initializeSmoothScrolling();
@@ -478,12 +505,12 @@ function initializeNavigation() {
 function initializeMobileMenu() {
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
-    
+
     if (mobileMenuBtn && mobileMenu) {
         mobileMenuBtn.addEventListener('click', () => {
             mobileMenu.classList.toggle('hidden');
         });
-        
+
         // Close mobile menu when clicking on a link
         const mobileLinks = mobileMenu.querySelectorAll('a');
         mobileLinks.forEach(link => {
@@ -491,9 +518,9 @@ function initializeMobileMenu() {
                 mobileMenu.classList.add('hidden');
             });
         });
-        
+
         // Close mobile menu when clicking outside
-        document.addEventListener('click', (e) => {
+        document.addEventListener('click', e => {
             if (!mobileMenuBtn.contains(e.target) && !mobileMenu.contains(e.target)) {
                 mobileMenu.classList.add('hidden');
             }
@@ -507,11 +534,11 @@ function initializeMobileMenu() {
 function getCurrentPage() {
     const path = window.location.pathname;
     const page = path.split('/').pop();
-    
+
     if (page === '' || page === 'index.html') {
         return 'home';
     }
-    
+
     return page.replace('.html', '');
 }
 
@@ -520,17 +547,17 @@ function getCurrentPage() {
  */
 function updateActiveNavLink(currentPage) {
     const navLinks = document.querySelectorAll('.nav-link');
-    
+
     navLinks.forEach(link => {
         const href = link.getAttribute('href');
         let linkPage;
-        
+
         if (href === '/' || href === 'index.html') {
             linkPage = 'home';
         } else {
             linkPage = href.replace('.html', '');
         }
-        
+
         if (linkPage === currentPage) {
             link.classList.add('text-cyan-400', 'font-semibold');
             link.classList.remove('text-white');
@@ -546,12 +573,12 @@ function updateActiveNavLink(currentPage) {
  */
 function initializeSmoothScrolling() {
     const anchorLinks = document.querySelectorAll('a[href^="#"]');
-    
+
     anchorLinks.forEach(link => {
         link.addEventListener('click', function(e) {
             const targetId = this.getAttribute('href');
             const targetElement = document.querySelector(targetId);
-            
+
             if (targetElement) {
                 e.preventDefault();
                 targetElement.scrollIntoView({
@@ -582,13 +609,14 @@ function showErrorMessage(message) {
  */
 function showNotification(message, type = 'success') {
     const notification = document.createElement('div');
-    const iconSvg = type === 'success' 
-        ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>'
-        : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
-    
+    const iconSvg
+        = type === 'success'
+            ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>'
+            : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
+
     const bgColor = type === 'success' ? 'bg-green-600' : 'bg-red-600';
     const iconColor = type === 'success' ? 'text-green-200' : 'text-red-200';
-    
+
     notification.className = `notification ${bgColor}`;
     notification.innerHTML = `
         <div class="notification-content">
@@ -601,9 +629,9 @@ function showNotification(message, type = 'success') {
             </div>
         </div>
     `;
-    
+
     document.body.appendChild(notification);
-    
+
     // Remove notification after delay
     const delay = type === 'success' ? 5000 : 7000;
     setTimeout(() => {
@@ -618,15 +646,18 @@ function showNotification(message, type = 'success') {
  */
 function handleFormSubmission(form, handler, options = {}) {
     const { context = 'Form Submission', handleErrors = true } = options;
-    
+
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
-        
+
         const formData = new FormData(this);
         const data = Object.fromEntries(formData.entries());
-        
-        errorHandler.logInfo(context, 'Form submitted', { formId: form.id, data: Object.keys(data) });
-        
+
+        errorHandler.logInfo(context, 'Form submitted', {
+            formId: form.id,
+            data: Object.keys(data)
+        });
+
         try {
             await handler(data);
         } catch (error) {
@@ -643,16 +674,16 @@ function handleFormSubmission(form, handler, options = {}) {
 
 /**
  * Initialize newsletter form functionality
- * 
+ *
  * KNOWN ISSUE: Server-side CORS Configuration Problem
  * The API server at france-lauterbourg.vpn.zkynet.org currently sends:
  * Access-Control-Allow-Origin: https://zkynet.org,https://www.zkynet.org
- * 
+ *
  * This violates CORS spec which requires either:
  * 1. Single origin per header: Access-Control-Allow-Origin: https://zkynet.org
  * 2. Dynamic origin based on request Origin header
  * 3. Wildcard for development: Access-Control-Allow-Origin: *
- * 
+ *
  * Until server is fixed, newsletter form will fail on ALL domains.
  */
 function initializeNewsletterForm() {
@@ -673,10 +704,12 @@ async function handleNewsletterSubmission(data) {
     const context = 'Newsletter Subscription';
     const submitButton = document.querySelector('#newsletter-form button[type="submit"]');
     const originalText = submitButton ? submitButton.textContent : '';
-    
+
     try {
-        errorHandler.logInfo(context, 'Starting newsletter subscription', { email: data.email.substring(0, 5) + '...' });
-        
+        errorHandler.logInfo(context, 'Starting newsletter subscription', {
+            email: `${data.email.substring(0, 5)  }...`
+        });
+
         // Show loading state
         if (submitButton) {
             submitButton.textContent = 'Subscribing...';
@@ -686,9 +719,9 @@ async function handleNewsletterSubmission(data) {
         // Prepare request
         const requestData = { email: data.email };
         const apiUrl = 'https://france-lauterbourg.vpn.zkynet.org/api/support';
-        
-        errorHandler.logInfo(context, 'Preparing API request', { 
-            url: apiUrl, 
+
+        errorHandler.logInfo(context, 'Preparing API request', {
+            url: apiUrl,
             data: requestData,
             origin: window.location.origin,
             hostname: window.location.hostname,
@@ -704,7 +737,7 @@ async function handleNewsletterSubmission(data) {
         }, 10000); // 10 second timeout
 
         try {
-            errorHandler.logInfo(context, 'Sending API request', { 
+            errorHandler.logInfo(context, 'Sending API request', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 timeout: '10s'
@@ -714,7 +747,7 @@ async function handleNewsletterSubmission(data) {
             const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(requestData),
                 signal: controller.signal
@@ -722,8 +755,8 @@ async function handleNewsletterSubmission(data) {
 
             clearTimeout(timeoutId);
 
-            errorHandler.logInfo(context, 'API response received', { 
-                status: response.status, 
+            errorHandler.logInfo(context, 'API response received', {
+                status: response.status,
                 statusText: response.statusText,
                 ok: response.ok,
                 headers: Object.fromEntries(response.headers.entries()),
@@ -738,9 +771,11 @@ async function handleNewsletterSubmission(data) {
                     // JSON parsing failed but response was OK
                     errorHandler.logInfo(context, 'Subscription successful (no JSON response)');
                 }
-                
-                errorHandler.showUserSuccess('Successfully subscribed to our newsletter! You\'ll be the first to know about ZKyNet updates.');
-                
+
+                errorHandler.showUserSuccess(
+                    "Successfully subscribed to our newsletter! You'll be the first to know about ZKyNet updates."
+                );
+
                 // Clear the form
                 document.querySelector('#newsletter-form').reset();
             } else {
@@ -748,10 +783,9 @@ async function handleNewsletterSubmission(data) {
                 const errorInfo = await errorHandler.handleApiError(response, context);
                 errorHandler.showUserError(errorInfo.message);
             }
-
         } catch (fetchError) {
             clearTimeout(timeoutId);
-            
+
             // Handle abort/timeout errors specifically - distinguish real timeouts from CORS blocks
             if (fetchError.name === 'AbortError' && timeoutTriggered) {
                 // This was a real timeout triggered by our controller
@@ -759,7 +793,7 @@ async function handleNewsletterSubmission(data) {
                 errorHandler.showUserError('Request timed out. Please try again.');
                 return;
             }
-            
+
             // Handle network errors (including CORS-blocked AbortErrors) using unified system
             const errorInfo = errorHandler.handleNetworkError(fetchError, context, {
                 email: data.email ? 'provided' : 'missing',
@@ -768,12 +802,11 @@ async function handleNewsletterSubmission(data) {
             });
             errorHandler.showUserError(errorInfo.message);
         }
-
     } catch (error) {
         // Handle any other errors
-        errorHandler.logError(context, error, { 
+        errorHandler.logError(context, error, {
             step: 'general_error',
-            email: data.email ? 'provided' : 'missing' 
+            email: data.email ? 'provided' : 'missing'
         });
         errorHandler.showUserError('An unexpected error occurred. Please try again.');
     } finally {
@@ -804,10 +837,11 @@ function initializeDebugMode() {
     }
 
     // Enable debug mode only in development environments
-    const shouldEnableDebug = errorHandler.isDebugMode || 
-                             window.location.search.includes('debug=true') ||
-                             localStorage.getItem('zkynet-debug') === 'true';
-    
+    const shouldEnableDebug
+        = errorHandler.isDebugMode
+        || window.location.search.includes('debug=true') ||
+        localStorage.getItem('zkynet-debug') === 'true';
+
     if (shouldEnableDebug) {
         errorHandler.logInfo('Debug Mode', 'Debug mode enabled', {
             hostname: window.location.hostname,
@@ -815,17 +849,17 @@ function initializeDebugMode() {
             search: window.location.search,
             localStorage: localStorage.getItem('zkynet-debug')
         });
-        
+
         createDebugPanel();
         enableGlobalDebugFunctions();
     }
-    
+
     // Add manual debug activation
     window.enableZKyNetDebug = function() {
         localStorage.setItem('zkynet-debug', 'true');
         location.reload();
     };
-    
+
     // Log availability even when debug is disabled
     console.log('🔧 ZKyNet Debug Available - Run enableZKyNetDebug() to activate');
 }
@@ -849,9 +883,9 @@ function createDebugPanel() {
             <div id="debug-results" style="margin-top: 10px; max-height: 300px; overflow-y: auto; background: rgba(255,255,255,0.1); padding: 8px; border-radius: 4px; white-space: pre-wrap; font-size: 10px;"></div>
         </div>
     `;
-    
+
     document.body.appendChild(debugPanel);
-    
+
     // Auto-run diagnostics
     setTimeout(() => runApiDiagnostics(), 1000);
 }
@@ -862,20 +896,24 @@ function createDebugPanel() {
 async function runApiDiagnostics() {
     const statusDiv = document.getElementById('debug-status');
     const resultsDiv = document.getElementById('debug-results');
-    
-    if (statusDiv) statusDiv.textContent = 'Running API diagnostics...';
-    if (resultsDiv) resultsDiv.textContent = 'Testing API endpoints...\n\n';
-    
+
+    if (statusDiv) {
+        statusDiv.textContent = 'Running API diagnostics...';
+    }
+    if (resultsDiv) {
+        resultsDiv.textContent = 'Testing API endpoints...\n\n';
+    }
+
     try {
         const results = await errorHandler.runApiDiagnostics();
-        
-        let output = `=== API DIAGNOSTICS RESULTS ===\n`;
+
+        let output = '=== API DIAGNOSTICS RESULTS ===\n';
         output += `Time: ${results.timestamp}\n`;
         output += `Environment: ${results.environment.origin}\n`;
         output += `Is Local: ${results.environment.isLocal}\n\n`;
-        
+
         // Health test results
-        output += `📊 HEALTH CHECK:\n`;
+        output += '📊 HEALTH CHECK:\n';
         if (results.tests.health.success) {
             output += `✅ SUCCESS (${results.tests.health.status})\n`;
             output += `Data: ${JSON.stringify(results.tests.health.data, null, 2)}\n`;
@@ -883,10 +921,10 @@ async function runApiDiagnostics() {
             output += `❌ FAILED (${results.tests.health.type})\n`;
             output += `Error: ${results.tests.health.error}\n`;
         }
-        output += `\n`;
-        
-        // CORS test results  
-        output += `🔒 CORS PREFLIGHT:\n`;
+        output += '\n';
+
+        // CORS test results
+        output += '🔒 CORS PREFLIGHT:\n';
         if (results.tests.cors.success) {
             output += `✅ SUCCESS (${results.tests.cors.status})\n`;
             output += `CORS Headers:\n${JSON.stringify(results.tests.cors.corsHeaders, null, 2)}\n`;
@@ -894,10 +932,10 @@ async function runApiDiagnostics() {
             output += `❌ FAILED (${results.tests.cors.type})\n`;
             output += `Error: ${results.tests.cors.error}\n`;
         }
-        output += `\n`;
-        
+        output += '\n';
+
         // Support API test results
-        output += `📧 SUPPORT API:\n`;
+        output += '📧 SUPPORT API:\n';
         if (results.tests.support.success) {
             output += `✅ SUCCESS (${results.tests.support.status})\n`;
             output += `Data: ${JSON.stringify(results.tests.support.data, null, 2)}\n`;
@@ -905,14 +943,16 @@ async function runApiDiagnostics() {
             output += `❌ FAILED (${results.tests.support.type})\n`;
             output += `Error: ${results.tests.support.error}\n`;
         }
-        
-        if (resultsDiv) resultsDiv.textContent = output;
-        
+
+        if (resultsDiv) {
+            resultsDiv.textContent = output;
+        }
+
         // Update status
         const healthOk = results.tests.health.success;
         const corsOk = results.tests.cors.success;
         const supportOk = results.tests.support.success;
-        
+
         let statusMsg = '';
         if (healthOk && corsOk && supportOk) {
             statusMsg = '✅ All tests passed - API is working';
@@ -925,12 +965,17 @@ async function runApiDiagnostics() {
         } else {
             statusMsg = '⚠️ Mixed results - Check logs';
         }
-        
-        if (statusDiv) statusDiv.textContent = statusMsg;
-        
+
+        if (statusDiv) {
+            statusDiv.textContent = statusMsg;
+        }
     } catch (error) {
-        if (resultsDiv) resultsDiv.textContent = `ERROR: ${error.message}`;
-        if (statusDiv) statusDiv.textContent = '❌ Diagnostic test failed';
+        if (resultsDiv) {
+            resultsDiv.textContent = `ERROR: ${error.message}`;
+        }
+        if (statusDiv) {
+            statusDiv.textContent = '❌ Diagnostic test failed';
+        }
     }
 }
 
@@ -939,15 +984,22 @@ async function runApiDiagnostics() {
  */
 async function testNewsletterForm() {
     const resultsDiv = document.getElementById('debug-results');
-    if (resultsDiv) resultsDiv.textContent = 'Testing newsletter form...\n\n';
-    
+    if (resultsDiv) {
+        resultsDiv.textContent = 'Testing newsletter form...\n\n';
+    }
+
     try {
         const testData = { email: 'debug-test@example.com', terms: 'on' };
         await handleNewsletterSubmission(testData);
-        
-        if (resultsDiv) resultsDiv.textContent += '\n✅ Newsletter form test completed - check console for details';
+
+        if (resultsDiv) {
+            resultsDiv.textContent +=
+                '\n✅ Newsletter form test completed - check console for details';
+        }
     } catch (error) {
-        if (resultsDiv) resultsDiv.textContent += `\n❌ Newsletter form test failed: ${error.message}`;
+        if (resultsDiv) {
+            resultsDiv.textContent += `\n❌ Newsletter form test failed: ${error.message}`;
+        }
     }
 }
 
@@ -956,7 +1008,9 @@ async function testNewsletterForm() {
  */
 function clearDebugLogs() {
     const resultsDiv = document.getElementById('debug-results');
-    if (resultsDiv) resultsDiv.textContent = '';
+    if (resultsDiv) {
+        resultsDiv.textContent = '';
+    }
     console.clear();
 }
 
@@ -971,10 +1025,10 @@ function enableGlobalDebugFunctions() {
     window.ZKyNetDebug = {
         testHealth: () => errorHandler.testApiHealth(),
         testCors: () => errorHandler.testCorsPreFlight(),
-        testSupport: (email) => errorHandler.testSupportApi(email),
+        testSupport: email => errorHandler.testSupportApi(email),
         runDiagnostics: () => errorHandler.runApiDiagnostics()
     };
-    
+
     console.log('🔧 ZKyNet Debug Mode Enabled');
     console.log('Available functions:', Object.keys(window.ZKyNetDebug));
     console.log('Add ?debug=true to URL to show debug panel');
@@ -988,5 +1042,5 @@ window.ZKyNet = {
     handleFormSubmission,
     getCurrentPage,
     updateActiveNavLink,
-    errorHandler: errorHandler  // Export unified error handler
+    errorHandler: errorHandler // Export unified error handler
 };
