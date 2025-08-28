@@ -14,12 +14,36 @@ class ErrorHandler {
 
     /**
      * Detect if we're in debug/development mode
+     * Production-safe: only enables on explicit localhost or debug parameters
      */
     detectDebugMode() {
-        return window.location.hostname === 'localhost' || 
-               window.location.hostname === '127.0.0.1' ||
-               window.location.hostname.includes('192.168') ||
-               window.location.search.includes('debug=true');
+        // Never enable debug mode on production domains
+        if (this.isProductionDomain()) {
+            return false;
+        }
+        
+        // Only enable debug mode on explicit localhost or with explicit debug flags
+        return (window.location.hostname === 'localhost' || 
+                window.location.hostname === '127.0.0.1') ||
+               window.location.search.includes('debug=true') ||
+               localStorage.getItem('zkynet-debug') === 'true';
+    }
+
+    /**
+     * Check if we're on a production domain
+     */
+    isProductionDomain() {
+        const hostname = window.location.hostname;
+        // Add your production domains here
+        const productionDomains = [
+            'zkynet.org',
+            'www.zkynet.org',
+            // Add any other production domains
+        ];
+        
+        return productionDomains.some(domain => 
+            hostname === domain || hostname.endsWith('.' + domain)
+        );
     }
 
     /**
@@ -101,18 +125,27 @@ class ErrorHandler {
      * Handle network errors with improved CORS detection
      */
     handleNetworkError(error, context, details = {}) {
-        this.logError(`Network Error - ${context}`, error, details);
-
         let userMessage = 'Network error. Please check your connection and try again.';
         let errorType = 'network';
         
-        // Detect CORS issues
-        if (error?.message?.includes('CORS') || 
-            error?.message?.includes('Cross-Origin') ||
-            (error?.message?.includes('Failed to fetch') && this.isLikelyCorsError(details))) {
-            errorType = 'cors';
-            if (this.isLocalDevelopment()) {
-                userMessage = 'CORS blocked: This API call works on the live site but is blocked when running locally. The newsletter form will work when deployed.';
+        // Detect CORS issues with enhanced detection for server misconfigurations
+        const isCorsError = error?.message?.includes('CORS') || 
+                           error?.message?.includes('Cross-Origin') ||
+                           (error?.message?.includes('Failed to fetch') && this.isLikelyCorsError(details));
+        
+        const isServerCorsConfig = error?.message?.includes('multiple values') && error?.message?.includes('Access-Control-Allow-Origin');
+        
+        if (isCorsError || isServerCorsConfig) {
+            errorType = isCorsError ? 'cors' : 'cors_server_config';
+            
+            if (isServerCorsConfig) {
+                // Server-side CORS configuration error
+                userMessage = 'Server Configuration Error: The API server has a CORS configuration issue. Please contact the development team to fix the Access-Control-Allow-Origin header format.';
+            } else if (details.url && details.url.includes('france-lauterbourg.vpn.zkynet.org')) {
+                // Known API CORS issue
+                userMessage = 'Known Server Issue: The API server has a CORS configuration problem (multiple origins in header). This affects all domains until the server is fixed.';
+            } else if (this.isLocalDevelopment()) {
+                userMessage = 'Development Mode: CORS policy blocks localhost requests to the API. This form works on the live site (zkynet.org). Enable debug mode with ?debug=true to see technical details.';
             } else {
                 userMessage = 'Connection blocked by security policy. Please contact support.';
             }
@@ -127,10 +160,19 @@ class ErrorHandler {
             userMessage = 'Request timed out. Please try again.';
         }
 
+        // Log the properly categorized error
+        this.logError(`${errorType.toUpperCase()} Error - ${context}`, error, {
+            ...details,
+            errorType: errorType,
+            corsCheckResult: this.isLikelyCorsError(details),
+            userMessage: userMessage
+        });
+
         this.logInfo(context, 'Network error classification', {
             errorType: errorType,
             isLocal: this.isLocalDevelopment(),
-            errorMessage: error?.message
+            errorMessage: error?.message,
+            detectedAsCors: isCorsError || isServerCorsConfig
         });
 
         return {
@@ -148,9 +190,22 @@ class ErrorHandler {
         // 1. Making requests from localhost to external domains
         // 2. No response data is available
         // 3. Specific URL patterns that suggest cross-origin
-        return this.isLocalDevelopment() && 
-               details.url && 
-               !details.url.includes(window.location.hostname);
+        
+        // Enhanced CORS detection for the ZKyNet API case
+        if (details.url) {
+            // Check for known external API endpoints with CORS issues
+            if (details.url.includes('france-lauterbourg.vpn.zkynet.org')) {
+                // This API has known CORS server configuration issues
+                return true;
+            }
+            
+            // Check for cross-origin request (different hostname) in dev mode
+            if (this.isLocalDevelopment() && !details.url.includes(window.location.hostname)) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     /**
@@ -588,6 +643,17 @@ function handleFormSubmission(form, handler, options = {}) {
 
 /**
  * Initialize newsletter form functionality
+ * 
+ * KNOWN ISSUE: Server-side CORS Configuration Problem
+ * The API server at france-lauterbourg.vpn.zkynet.org currently sends:
+ * Access-Control-Allow-Origin: https://zkynet.org,https://www.zkynet.org
+ * 
+ * This violates CORS spec which requires either:
+ * 1. Single origin per header: Access-Control-Allow-Origin: https://zkynet.org
+ * 2. Dynamic origin based on request Origin header
+ * 3. Wildcard for development: Access-Control-Allow-Origin: *
+ * 
+ * Until server is fixed, newsletter form will fail on ALL domains.
  */
 function initializeNewsletterForm() {
     const newsletterForm = document.querySelector('#newsletter-form');
@@ -631,7 +697,11 @@ async function handleNewsletterSubmission(data) {
 
         // Create fetch with timeout
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+        let timeoutTriggered = false;
+        const timeoutId = setTimeout(() => {
+            timeoutTriggered = true;
+            controller.abort();
+        }, 10000); // 10 second timeout
 
         try {
             errorHandler.logInfo(context, 'Sending API request', { 
@@ -682,14 +752,15 @@ async function handleNewsletterSubmission(data) {
         } catch (fetchError) {
             clearTimeout(timeoutId);
             
-            // Handle abort/timeout errors specifically
-            if (fetchError.name === 'AbortError') {
+            // Handle abort/timeout errors specifically - distinguish real timeouts from CORS blocks
+            if (fetchError.name === 'AbortError' && timeoutTriggered) {
+                // This was a real timeout triggered by our controller
                 errorHandler.logError(context, new Error('Request timeout'), { timeout: '10s' });
                 errorHandler.showUserError('Request timed out. Please try again.');
                 return;
             }
             
-            // Handle network errors using unified system
+            // Handle network errors (including CORS-blocked AbortErrors) using unified system
             const errorInfo = errorHandler.handleNetworkError(fetchError, context, {
                 email: data.email ? 'provided' : 'missing',
                 url: apiUrl,
@@ -723,10 +794,40 @@ async function handleNewsletterSubmission(data) {
  * Initialize debug mode if enabled
  */
 function initializeDebugMode() {
-    if (errorHandler.isDebugMode || window.location.search.includes('debug=true')) {
+    // Production safety: never enable debug mode on production domains
+    if (errorHandler.isProductionDomain()) {
+        // Clear any debug flags that might be set
+        if (localStorage.getItem('zkynet-debug')) {
+            localStorage.removeItem('zkynet-debug');
+        }
+        return;
+    }
+
+    // Enable debug mode only in development environments
+    const shouldEnableDebug = errorHandler.isDebugMode || 
+                             window.location.search.includes('debug=true') ||
+                             localStorage.getItem('zkynet-debug') === 'true';
+    
+    if (shouldEnableDebug) {
+        errorHandler.logInfo('Debug Mode', 'Debug mode enabled', {
+            hostname: window.location.hostname,
+            port: window.location.port,
+            search: window.location.search,
+            localStorage: localStorage.getItem('zkynet-debug')
+        });
+        
         createDebugPanel();
         enableGlobalDebugFunctions();
     }
+    
+    // Add manual debug activation
+    window.enableZKyNetDebug = function() {
+        localStorage.setItem('zkynet-debug', 'true');
+        location.reload();
+    };
+    
+    // Log availability even when debug is disabled
+    console.log('🔧 ZKyNet Debug Available - Run enableZKyNetDebug() to activate');
 }
 
 /**

@@ -273,7 +273,7 @@ function openEmailClient(service, contactData) {
 /**
  * Create structured email template
  */
-function createEmailTemplate(contactData, subjectText) {
+function createEmailTemplate(contactData) {
     return `Hello ZKyNet Team,
 
 My inquiry details:

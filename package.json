@@ -1,0 +1,57 @@
+{
+  "name": "zkynet-landing-page",
+  "version": "1.0.0",
+  "description": "ZKyNet Privacy Infrastructure Landing Page",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npm-run-all --parallel dev:css dev:serve watch:files",
+    "dev:css": "cd config && npx tailwindcss --content '../*.html' '../src/**/*.html' -i ../src/assets/css/input.css -o ../src/assets/css/main.css --watch",
+    "dev:serve": "http-server -p 8000 -c-1 --cors",
+    "watch:files": "chokidar \"**/*.html\" \"src/assets/js/**/*.js\" -c \"echo 'Files changed - refresh browser'\"",
+    "build": "npm run build:css && npm run minify:js",
+    "build:css": "cd config && npx tailwindcss --content '../*.html' '../src/**/*.html' -i ../src/assets/css/input.css -o ../dist/assets/css/main.css --minify",
+    "minify:js": "mkdir -p dist/assets/js && uglifyjs src/assets/js/*.js -o dist/assets/js/main.min.js --compress --mangle",
+    "start": "http-server dist -p 8000",
+    "lint": "eslint src/assets/js/**/*.js",
+    "format": "prettier --write \"**/*.{js,css,html,md}\"",
+    "test": "echo \"No tests yet\" && exit 0",
+    "hint": "npx hint http://localhost:8000",
+    "hint:local": "npx hint .",
+    "test:quality": "npm run build && npm run lint && npm run hint:local",
+    "test:a11y": "npx hint . --hint axe",
+    "precommit": "npm run lint && npm run hint:local"
+  },
+  "keywords": [
+    "zkynet",
+    "privacy",
+    "zero-knowledge",
+    "tor",
+    "blockchain"
+  ],
+  "author": "ZKyNet Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.10",
+    "autoprefixer": "^10.4.16",
+    "chokidar-cli": "^3.0.0",
+    "cssnano": "^6.0.1",
+    "eslint": "^8.55.0",
+    "http-server": "^14.1.1",
+    "npm-run-all": "^4.1.5",
+    "postcss": "^8.4.32",
+    "postcss-cli": "^11.0.0",
+    "prettier": "^3.1.0",
+    "tailwindcss": "^3.3.6",
+    "uglify-js": "^3.17.4"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}

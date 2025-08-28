@@ -1,7 +1,130 @@
-VISION.md
-TODO.md
-VPS_API_REFERENCE.md
-test_contact.html
-test_encoding.html
-tmp-context/
+# Temporary files (now organized in tmp/ directory)
+tmp/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn-integrity
+
+# Build outputs
+dist/
+build/
+*.tgz
+*.tar.gz
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs
+*.log
+loglevel.json
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Docker
+.docker/
+docker-compose.override.yml
+.dockerignore
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+.temp/
+
+# Cache directories
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+
+# CSS build artifacts (since we're using PostCSS/Tailwind)
+assets/css/main.css.map
+
+# Backup files
+*.bak
+*.backup
+
+# Local development
+.local/
+.dev/
+
+# Claude Code specific files
 CLAUDE.md
+
+# Testing and development directories
+testing/
+tests/backup/
+tests/archive/
+
+# Documentation and project management (development only)
+docs/QUALITY_ANALYSIS_REPORT.md
+docs/README.md
+docs/general-structure.md
+
+# Debug and diagnostic files
+*-debug.txt
+*-debug.log
+email-storage-debug.txt
+
+# Docker testing environment (located in testing/docker/)
+testing/docker/
+Dockerfile
+docker-compose.yml
+DOCKER.md
+
+# Tool configuration backups
+*.config.backup
+postcss.config.backup.js
+tailwind.config.backup.js
+
+# Development server files
+.serve/
+serve/
+
+# Webhint and linting temporary files
+.hint-cache/
+.eslint-cache
+.stylelint-cache
+.hintrc
+hint-report/
+
+# Package manager lockfiles (keep package.json, ignore locks for flexibility)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
