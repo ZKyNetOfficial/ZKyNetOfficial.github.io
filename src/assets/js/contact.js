@@ -5,32 +5,33 @@
 
 // Initialize contact form when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    initializeContactForm();
+    window.initializeContactForm();
 });
 
 /**
  * Initialize contact form functionality
  */
-function initializeContactForm() {
+window.initializeContactForm = function initializeContactForm() {
     const contactForm = document.querySelector('#contact-form');
     if (contactForm) {
-        ZKyNet.handleFormSubmission(contactForm, handleContactForm, {
+        ZKyNet.handleFormSubmission(contactForm, window.handleContactForm, {
             context: 'Contact Form',
             handleErrors: false // Let contact form handle its own errors
         });
     }
-}
+};
 
 /**
  * Handle contact form submission with unified error system
+ * @param {Object} data - Form data from the contact form
  */
-async function handleContactForm(data) {
+window.handleContactForm = async function handleContactForm(data) {
     const context = 'Contact Form';
     const submitButton = document.querySelector('#contact-form button[type="submit"]');
     const originalText = submitButton ? submitButton.textContent : '';
 
     try {
-        ZKyNet.errorHandler.logInfo(context, 'Starting contact form submission', {
+        ZKyNet.zkynetErrorHandler.logInfo(context, 'Starting contact form submission', {
             hasName: !!(data.firstName && data.lastName),
             hasSubject: !!data.subject,
             hasMessage: !!data.message
@@ -50,25 +51,28 @@ async function handleContactForm(data) {
             message: data.message
         };
 
-        ZKyNet.errorHandler.logInfo(context, 'Contact data prepared', {
+        ZKyNet.zkynetErrorHandler.logInfo(context, 'Contact data prepared', {
             name: contactData.name,
             hasCompany: !!contactData.company,
             subject: contactData.subject
         });
 
         // Show email service selection modal
-        showEmailServiceModal(contactData);
+        window.showEmailServiceModal(contactData);
 
         // Clear the form
         document.querySelector('#contact-form').reset();
 
-        ZKyNet.errorHandler.logInfo(context, 'Contact form submission completed successfully');
+        ZKyNet.zkynetErrorHandler.logInfo(
+            context,
+            'Contact form submission completed successfully'
+        );
     } catch (error) {
-        const errorInfo = ZKyNet.errorHandler.handleNetworkError(error, context, {
+        const errorInfo = ZKyNet.zkynetErrorHandler.handleNetworkError(error, context, {
             formData: Object.keys(data),
             step: 'form_processing'
         });
-        ZKyNet.errorHandler.showUserError(errorInfo.message);
+        ZKyNet.zkynetErrorHandler.showUserError(errorInfo.message);
     } finally {
         // Reset button state
         if (submitButton) {
@@ -76,12 +80,13 @@ async function handleContactForm(data) {
             submitButton.disabled = false;
         }
     }
-}
+};
 
 /**
  * Show email service selection modal
+ * @param {Object} contactData - Contact form data object
  */
-function showEmailServiceModal(contactData) {
+window.showEmailServiceModal = function showEmailServiceModal(contactData) {
     const modalHtml = `
         <div id="email-service-modal" class="modal-backdrop" onclick="handleModalBackdropClick(event)">
             <div class="modal-content" onclick="event.stopPropagation()">
@@ -98,7 +103,7 @@ function showEmailServiceModal(contactData) {
                     <p style="color: #d1d5db; margin-bottom: 1.5rem;">Select your preferred email service to send your message:</p>
                     
                     <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                        <button onclick="openEmailClient('mailto', ${JSON.stringify(contactData).replace(/"/g, '&quot;')})" 
+                        <button onclick="window.openEmailClient('mailto', ${JSON.stringify(contactData).replace(/"/g, '&quot;')})" 
                                 class="email-service-option">
                             <div style="display: flex; align-items: center; gap: 0.75rem;">
                                 <div class="email-service-icon mailto-icon">
@@ -117,7 +122,7 @@ function showEmailServiceModal(contactData) {
                             </svg>
                         </button>
 
-                        <button onclick="openEmailClient('gmail', ${JSON.stringify(contactData).replace(/"/g, '&quot;')})" 
+                        <button onclick="window.openEmailClient('gmail', ${JSON.stringify(contactData).replace(/"/g, '&quot;')})" 
                                 class="email-service-option">
                             <div style="display: flex; align-items: center; gap: 0.75rem;">
                                 <div class="email-service-icon gmail-icon">G</div>
@@ -131,7 +136,7 @@ function showEmailServiceModal(contactData) {
                             </svg>
                         </button>
 
-                        <button onclick="openEmailClient('outlook', ${JSON.stringify(contactData).replace(/"/g, '&quot;')})" 
+                        <button onclick="window.openEmailClient('outlook', ${JSON.stringify(contactData).replace(/"/g, '&quot;')})" 
                                 class="email-service-option">
                             <div style="display: flex; align-items: center; gap: 0.75rem;">
                                 <div class="email-service-icon outlook-icon">O</div>
@@ -145,7 +150,7 @@ function showEmailServiceModal(contactData) {
                             </svg>
                         </button>
 
-                        <button onclick="openEmailClient('yahoo', ${JSON.stringify(contactData).replace(/"/g, '&quot;')})" 
+                        <button onclick="window.openEmailClient('yahoo', ${JSON.stringify(contactData).replace(/"/g, '&quot;')})" 
                                 class="email-service-option">
                             <div style="display: flex; align-items: center; gap: 0.75rem;">
                                 <div class="email-service-icon yahoo-icon">Y</div>
@@ -167,47 +172,51 @@ function showEmailServiceModal(contactData) {
     document.body.insertAdjacentHTML('beforeend', modalHtml);
 
     // Add escape key listener
-    document.addEventListener('keydown', handleModalEscapeKey);
-}
+    document.addEventListener('keydown', window.handleModalEscapeKey);
+};
 
 /**
  * Close email service modal
  */
-function closeEmailServiceModal() {
+window.closeEmailServiceModal = function closeEmailServiceModal() {
     const modal = document.getElementById('email-service-modal');
     if (modal) {
         modal.remove();
         // Remove escape key listener
-        document.removeEventListener('keydown', handleModalEscapeKey);
+        document.removeEventListener('keydown', window.handleModalEscapeKey);
     }
-}
+};
 
 /**
  * Handle backdrop click to close modal
+ * @param {Event} event - Click event
  */
-function handleModalBackdropClick(event) {
+window.handleModalBackdropClick = function handleModalBackdropClick(event) {
     if (event.target.id === 'email-service-modal') {
-        closeEmailServiceModal();
+        window.closeEmailServiceModal();
     }
-}
+};
 
 /**
  * Handle escape key to close modal
+ * @param {KeyboardEvent} event - Keyboard event
  */
-function handleModalEscapeKey(event) {
+window.handleModalEscapeKey = function handleModalEscapeKey(event) {
     if (event.key === 'Escape' && document.getElementById('email-service-modal')) {
-        closeEmailServiceModal();
+        window.closeEmailServiceModal();
     }
-}
+};
 
 /**
  * Handle email service selection with unified error handling
+ * @param {string} service - Email service type ('mailto', 'gmail', 'outlook', 'yahoo')
+ * @param {Object} contactData - Contact form data
  */
-function openEmailClient(service, contactData) {
+window.openEmailClient = function openEmailClient(service, contactData) {
     const context = 'Email Service Selection';
 
     try {
-        ZKyNet.errorHandler.logInfo(context, 'Opening email client', {
+        ZKyNet.zkynetErrorHandler.logInfo(context, 'Opening email client', {
             service: service,
             subject: contactData.subject,
             hasName: !!contactData.name
@@ -224,7 +233,7 @@ function openEmailClient(service, contactData) {
         };
         const subjectText = subjectMap[contactData.subject] || contactData.subject;
         const subject = encodeURIComponent(`ZKyNet Inquiry: ${subjectText}`);
-        const body = encodeURIComponent(createEmailTemplate(contactData, subjectText));
+        const body = encodeURIComponent(window.createEmailTemplate(contactData, subjectText));
         const to = encodeURIComponent('contact@zkynet.org');
 
         let url;
@@ -254,30 +263,32 @@ function openEmailClient(service, contactData) {
                 throw new Error(`Unknown email service: ${service}`);
         }
 
-        ZKyNet.errorHandler.logInfo(context, 'Email client opened successfully', {
+        ZKyNet.zkynetErrorHandler.logInfo(context, 'Email client opened successfully', {
             service: service
         });
 
         // Close modal and show success message
-        closeEmailServiceModal();
-        ZKyNet.errorHandler.showUserSuccess(
+        window.closeEmailServiceModal();
+        ZKyNet.zkynetErrorHandler.showUserSuccess(
             'Opening your email service. Please send the email to complete your inquiry.'
         );
     } catch (error) {
-        ZKyNet.errorHandler.logError(context, error, {
+        ZKyNet.zkynetErrorHandler.logError(context, error, {
             service: service,
             contactData: { subject: contactData.subject, hasName: !!contactData.name }
         });
-        ZKyNet.errorHandler.showUserError(
+        ZKyNet.zkynetErrorHandler.showUserError(
             'Failed to open email client. Please try a different service or contact us directly.'
         );
     }
-}
+};
 
 /**
  * Create structured email template
+ * @param {Object} contactData - Contact form data
+ * @returns {string} Formatted email template
  */
-function createEmailTemplate(contactData) {
+window.createEmailTemplate = function createEmailTemplate(contactData) {
     return `Hello ZKyNet Team,
 
 My inquiry details:
@@ -292,9 +303,6 @@ ${contactData.name}
 
 ---
 This email was generated through the ZKyNet contact form.`;
-}
+};
 
-// Make functions available globally for inline onclick handlers
-window.closeEmailServiceModal = closeEmailServiceModal;
-window.handleModalBackdropClick = handleModalBackdropClick;
-window.openEmailClient = openEmailClient;
+// Functions are already available on window object for inline onclick handlers

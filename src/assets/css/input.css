@@ -7,121 +7,126 @@
 
 /* Custom base styles */
 @layer base {
-  html {
-    scroll-behavior: smooth;
-  }
-  
-  body {
-    @apply bg-zky-dark text-white;
-  }
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        @apply bg-zky-dark text-white;
+    }
 }
 
 /* Custom component styles */
 @layer components {
-  .nav-link {
-    @apply transition-colors duration-200 hover:text-cyan-400;
-  }
-  
-  .glass-effect {
-    @apply backdrop-blur-md bg-black/30;
-  }
-  
-  .gradient-bg {
-    background: linear-gradient(135deg, theme('colors.zky-dark') 0%, theme('colors.zky-blue') 50%, theme('colors.zky-purple') 100%);
-  }
-  
-  .hover-scale {
-    @apply transition-transform duration-300 hover:scale-105;
-  }
-  
-  .feature-card {
-    @apply bg-slate-800 p-8 rounded-xl hover:bg-slate-700 transition-colors duration-300;
-  }
-  
-  .notification {
-    @apply fixed top-4 right-4 z-50 max-w-sm w-full shadow-lg rounded-lg p-4 text-white animate-slide-up;
-  }
-  
-  .notification-content {
-    @apply flex items-start;
-  }
-  
-  .notification-icon {
-    @apply flex-shrink-0 w-5 h-5 mt-0.5 mr-3;
-  }
-  
-  .notification-title {
-    @apply font-medium text-sm;
-  }
-  
-  .notification-message {
-    @apply text-sm opacity-90 mt-1;
-  }
-  
-  .email-service-option {
-    @apply w-full p-4 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors duration-200 flex items-center justify-between;
-  }
-  
-  .email-service-info h3 {
-    @apply font-medium text-white text-sm;
-  }
-  
-  .email-service-info p {
-    @apply text-gray-400 text-xs mt-1;
-  }
-  
-  .email-service-icon {
-    @apply w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm;
-  }
-  
-  .mailto-icon {
-    @apply bg-gray-600;
-  }
-  
-  .gmail-icon {
-    @apply bg-red-500;
-  }
-  
-  .outlook-icon {
-    @apply bg-blue-500;
-  }
-  
-  .yahoo-icon {
-    @apply bg-purple-600;
-  }
-  
-  .modal-backdrop {
-    @apply fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm;
-  }
-  
-  .modal-content {
-    @apply bg-slate-800 rounded-xl p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto;
-  }
-  
-  .modal-header {
-    @apply flex items-center justify-between mb-4;
-  }
-  
-  .modal-title {
-    @apply text-xl font-bold text-white;
-  }
-  
-  .modal-close-btn {
-    @apply text-gray-400 hover:text-white transition-colors p-1;
-  }
+    .nav-link {
+        @apply transition-colors duration-200 hover:text-cyan-400;
+    }
+
+    .glass-effect {
+        @apply backdrop-blur-md bg-black/30;
+    }
+
+    .gradient-bg {
+        background: linear-gradient(
+            135deg,
+            theme('colors.zky-dark') 0%,
+            theme('colors.zky-blue') 50%,
+            theme('colors.zky-purple') 100%
+        );
+    }
+
+    .hover-scale {
+        @apply transition-transform duration-300 hover:scale-105;
+    }
+
+    .feature-card {
+        @apply bg-slate-800 p-8 rounded-xl hover:bg-slate-700 transition-colors duration-300;
+    }
+
+    .notification {
+        @apply fixed top-4 right-4 z-50 max-w-sm w-full shadow-lg rounded-lg p-4 text-white animate-slide-up;
+    }
+
+    .notification-content {
+        @apply flex items-start;
+    }
+
+    .notification-icon {
+        @apply flex-shrink-0 w-5 h-5 mt-0.5 mr-3;
+    }
+
+    .notification-title {
+        @apply font-medium text-sm;
+    }
+
+    .notification-message {
+        @apply text-sm opacity-90 mt-1;
+    }
+
+    .email-service-option {
+        @apply w-full p-4 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors duration-200 flex items-center justify-between;
+    }
+
+    .email-service-info h3 {
+        @apply font-medium text-white text-sm;
+    }
+
+    .email-service-info p {
+        @apply text-gray-400 text-xs mt-1;
+    }
+
+    .email-service-icon {
+        @apply w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm;
+    }
+
+    .mailto-icon {
+        @apply bg-gray-600;
+    }
+
+    .gmail-icon {
+        @apply bg-red-500;
+    }
+
+    .outlook-icon {
+        @apply bg-blue-500;
+    }
+
+    .yahoo-icon {
+        @apply bg-purple-600;
+    }
+
+    .modal-backdrop {
+        @apply fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm;
+    }
+
+    .modal-content {
+        @apply bg-slate-800 rounded-xl p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto;
+    }
+
+    .modal-header {
+        @apply flex items-center justify-between mb-4;
+    }
+
+    .modal-title {
+        @apply text-xl font-bold text-white;
+    }
+
+    .modal-close-btn {
+        @apply text-gray-400 hover:text-white transition-colors p-1;
+    }
 }
 
 /* Custom utility classes */
 @layer utilities {
-  .text-shadow {
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .text-shadow-lg {
-    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
-  
-  .bg-gradient-zky {
-    background: linear-gradient(135deg, theme('colors.zky-blue'), theme('colors.zky-purple'));
-  }
+    .text-shadow {
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .text-shadow-lg {
+        text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .bg-gradient-zky {
+        background: linear-gradient(135deg, theme('colors.zky-blue'), theme('colors.zky-purple'));
+    }
 }

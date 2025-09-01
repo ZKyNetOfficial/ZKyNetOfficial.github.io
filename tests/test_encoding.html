@@ -1,18 +1,18 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>URL Encoding Test</title>
-</head>
-<body>
-    <h1>URL Encoding Test</h1>
-    <button onclick="testEncoding()">Test URL Encoding</button>
-    <div id="results" style="margin-top: 20px; font-family: monospace;"></div>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>URL Encoding Test</title>
+    </head>
+    <body>
+        <h1>URL Encoding Test</h1>
+        <button onclick="testEncoding()">Test URL Encoding</button>
+        <div id="results" style="margin-top: 20px; font-family: monospace"></div>
 
-    <script>
-        function createEmailTemplate(contactData, subjectText) {
-            return `Hello ZKyNet Team,
+        <script>
+            function createEmailTemplate(contactData, subjectText) {
+                return `Hello ZKyNet Team,
 
 My inquiry details:
 
@@ -26,52 +26,53 @@ ${contactData.name}
 
 ---
 This email was generated through the ZKyNet contact form.`;
-        }
+            }
 
-        function testEncoding() {
-            const testData = {
-                name: 'John Doe',
-                company: 'Test & Development Co.',
-                subject: 'enterprise',
-                message: 'This is a test message with special characters: @#$%^&*() and some newlines.\n\nSecond paragraph with spaces   and tabs\t\ttab.'
-            };
+            function testEncoding() {
+                const testData = {
+                    name: 'John Doe',
+                    company: 'Test & Development Co.',
+                    subject: 'enterprise',
+                    message:
+                        'This is a test message with special characters: @#$%^&*() and some newlines.\n\nSecond paragraph with spaces   and tabs\t\ttab.'
+                };
 
-            const subjectMap = {
-                'enterprise': 'Enterprise Partnership',
-                'technical': 'Technical Support',
-                'investment': 'Investment Opportunity',
-                'media': 'Media & Press',
-                'general': 'General Inquiry',
-                'other': 'Other'
-            };
+                const subjectMap = {
+                    enterprise: 'Enterprise Partnership',
+                    technical: 'Technical Support',
+                    investment: 'Investment Opportunity',
+                    media: 'Media & Press',
+                    general: 'General Inquiry',
+                    other: 'Other'
+                };
 
-            const subjectText = subjectMap[testData.subject] || testData.subject;
-            const subject = encodeURIComponent(`ZKyNet Inquiry: ${subjectText}`);
-            const body = encodeURIComponent(createEmailTemplate(testData, subjectText));
-            const to = encodeURIComponent('contact@zkynet.org');
+                const subjectText = subjectMap[testData.subject] || testData.subject;
+                const subject = encodeURIComponent(`ZKyNet Inquiry: ${subjectText}`);
+                const body = encodeURIComponent(createEmailTemplate(testData, subjectText));
+                const to = encodeURIComponent('contact@zkynet.org');
 
-            const urls = {
-                mailto: `mailto:${to}?subject=${subject}&body=${body}`,
-                gmail: `https://mail.google.com/mail/?view=cm&fs=1&to=${to}&su=${subject}&body=${body}`,
-                outlook: `https://outlook.live.com/owa/?path=/mail/action/compose&to=${to}&subject=${subject}&body=${body}`,
-                yahoo: `https://compose.mail.yahoo.com/?to=${to}&subject=${subject}&body=${body}`
-            };
+                const urls = {
+                    mailto: `mailto:${to}?subject=${subject}&body=${body}`,
+                    gmail: `https://mail.google.com/mail/?view=cm&fs=1&to=${to}&su=${subject}&body=${body}`,
+                    outlook: `https://outlook.live.com/owa/?path=/mail/action/compose&to=${to}&subject=${subject}&body=${body}`,
+                    yahoo: `https://compose.mail.yahoo.com/?to=${to}&subject=${subject}&body=${body}`
+                };
 
-            let results = '<h2>Test Results:</h2>';
-            results += '<h3>Contact Data:</h3>';
-            results += `<pre>${JSON.stringify(testData, null, 2)}</pre>`;
-            
-            results += '<h3>Generated URLs:</h3>';
-            Object.entries(urls).forEach(([service, url]) => {
-                results += `<h4>${service.toUpperCase()}:</h4>`;
-                results += `<div style="word-break: break-all; background: #f0f0f0; padding: 10px; margin: 5px 0;">${url}</div>`;
-            });
+                let results = '<h2>Test Results:</h2>';
+                results += '<h3>Contact Data:</h3>';
+                results += `<pre>${JSON.stringify(testData, null, 2)}</pre>`;
 
-            results += '<h3>Decoded Body (for verification):</h3>';
-            results += `<pre style="background: #f9f9f9; padding: 10px;">${createEmailTemplate(testData, subjectText)}</pre>`;
+                results += '<h3>Generated URLs:</h3>';
+                Object.entries(urls).forEach(([service, url]) => {
+                    results += `<h4>${service.toUpperCase()}:</h4>`;
+                    results += `<div style="word-break: break-all; background: #f0f0f0; padding: 10px; margin: 5px 0;">${url}</div>`;
+                });
 
-            document.getElementById('results').innerHTML = results;
-        }
-    </script>
-</body>
+                results += '<h3>Decoded Body (for verification):</h3>';
+                results += `<pre style="background: #f9f9f9; padding: 10px;">${createEmailTemplate(testData, subjectText)}</pre>`;
+
+                document.getElementById('results').innerHTML = results;
+            }
+        </script>
+    </body>
 </html>

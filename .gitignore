@@ -86,6 +86,8 @@ assets/css/main.css.map
 
 # Claude Code specific files
 CLAUDE.md
+.claude/
+.mcp.json
 
 # Testing and development directories
 testing/
