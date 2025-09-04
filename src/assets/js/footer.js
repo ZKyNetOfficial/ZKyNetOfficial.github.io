@@ -50,7 +50,7 @@ function renderFooter() {
                         <label for="newsletter-terms" class="text-gray-300">
                             I agree to the
                             <a
-                                href="${basePath}src/legal/privacy-policy.html"
+                                href="${basePath}legal/privacy-policy.html"
                                 class="text-blue-400 hover:text-blue-300 underline"
                                 target="_blank"
                                 rel="noopener noreferrer"
@@ -93,28 +93,28 @@ function renderFooter() {
                         <ul class="space-y-2">
                             <li>
                                 <a
-                                    href="${basePath}src/technology.html"
+                                    href="${basePath}technology.html"
                                     class="text-gray-400 hover:text-white transition-colors"
                                     >Overview</a
                                 >
                             </li>
                             <li>
                                 <a
-                                    href="${basePath}src/technology.html#zk-proofs"
+                                    href="${basePath}technology.html#zk-proofs"
                                     class="text-gray-400 hover:text-white transition-colors"
                                     >Zero-Knowledge Proofs</a
                                 >
                             </li>
                             <li>
                                 <a
-                                    href="${basePath}src/technology.html#privacy"
+                                    href="${basePath}technology.html#privacy"
                                     class="text-gray-400 hover:text-white transition-colors"
                                     >Dynamic Privacy</a
                                 >
                             </li>
                             <li>
                                 <a
-                                    href="${basePath}src/technology.html#rust"
+                                    href="${basePath}technology.html#rust"
                                     class="text-gray-400 hover:text-white transition-colors"
                                     >Rust Implementation</a
                                 >
@@ -127,28 +127,28 @@ function renderFooter() {
                         <ul class="space-y-2">
                             <li>
                                 <a
-                                    href="${basePath}src/products.html"
+                                    href="${basePath}products.html"
                                     class="text-gray-400 hover:text-white transition-colors"
                                     >Overview</a
                                 >
                             </li>
                             <li>
                                 <a
-                                    href="${basePath}src/products.html#consumer"
+                                    href="${basePath}products.html#consumer"
                                     class="text-gray-400 hover:text-white transition-colors"
                                     >Consumer VPN</a
                                 >
                             </li>
                             <li>
                                 <a
-                                    href="${basePath}src/products.html#enterprise"
+                                    href="${basePath}products.html#enterprise"
                                     class="text-gray-400 hover:text-white transition-colors"
                                     >Enterprise Solutions</a
                                 >
                             </li>
                             <li>
                                 <a
-                                    href="${basePath}src/products.html#node"
+                                    href="${basePath}products.html#node"
                                     class="text-gray-400 hover:text-white transition-colors"
                                     >Node Operations</a
                                 >
@@ -161,7 +161,7 @@ function renderFooter() {
                         <ul class="space-y-2">
                             <li>
                                 <a
-                                    href="${basePath}src/contact.html"
+                                    href="${basePath}contact.html"
                                     class="text-gray-400 hover:text-white transition-colors"
                                     >Contact</a
                                 >
@@ -177,7 +177,7 @@ function renderFooter() {
                             </li>
                             <li>
                                 <a
-                                    href="${basePath}src/docs/documentation.html"
+                                    href="${basePath}docs/documentation.html"
                                     class="text-gray-400 hover:text-white transition-colors"
                                     >Documentation</a
                                 >
