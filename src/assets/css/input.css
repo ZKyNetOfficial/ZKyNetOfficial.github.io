@@ -40,7 +40,7 @@
     }
 
     .feature-card {
-        @apply bg-slate-800 p-8 rounded-xl hover:bg-slate-700 transition-colors duration-300;
+        @apply bg-slate-800 p-6 sm:p-8 rounded-xl hover:bg-slate-700 transition-colors duration-300;
     }
 
     .notification {
