@@ -198,15 +198,15 @@ function renderFooter() {
                 <div class="border-t border-slate-800 mt-12 pt-8">
                     <div class="flex flex-col md:flex-row justify-between items-center">
                         <p class="text-gray-400 text-sm">© 2025 ZKyNet™. All rights reserved.</p>
-                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-6 mt-4 md:mt-0">
+                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-6 mt-4 md:mt-0 justify-center md:justify-end">
                             <a
                                 href="${basePath}legal/privacy-policy.html"
-                                class="text-gray-400 hover:text-white text-sm transition-colors py-2 px-1 min-h-[44px] flex items-center justify-center sm:justify-start"
+                                class="text-gray-400 hover:text-white text-sm transition-colors py-2 px-1 min-h-[44px] flex items-center justify-center"
                                 >Privacy Policy</a
                             >
                             <a
                                 href="${basePath}legal/terms-mvp.html"
-                                class="text-gray-400 hover:text-white text-sm transition-colors py-2 px-1 min-h-[44px] flex items-center justify-center sm:justify-start"
+                                class="text-gray-400 hover:text-white text-sm transition-colors py-2 px-1 min-h-[44px] flex items-center justify-center"
                                 >Terms of Service</a
                             >
                         </div>

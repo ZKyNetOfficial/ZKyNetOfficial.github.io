@@ -13,6 +13,23 @@
             content="privacy, zero-knowledge, tor, anonymity, legal compliance, rust, blockchain"
         />
 
+        <!-- Tailwind CDN -->
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            'zky-blue': '#1e3a8a',
+                            'zky-purple': '#7c3aed',
+                            'zky-dark': '#0f172a',
+                            'zky-light': '#f8fafc'
+                        }
+                    }
+                }
+            }
+        </script>
+
         <!-- Favicon -->
         <link rel="icon" type="image/x-icon" href="src/assets/images/zkynet-logo-512x512.png" />
         <link
@@ -181,7 +198,7 @@
                             Zero-Knowledge proofs and dynamic privacy balancing.
                         </p>
                         <div
-                            class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center mt-6 sm:mt-8"
+                            class="flex flex-col sm:flex-row gap-4 sm:gap-6 md:gap-8 justify-center items-center mt-6 sm:mt-8"
                         >
                             <a
                                 href="#newsletter"
@@ -199,24 +216,6 @@
                     </div>
                 </div>
 
-                <!-- Scroll Indicator -->
-                <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-                    <div class="animate-bounce">
-                        <svg
-                            class="h-6 w-6 text-white"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                            ></path>
-                        </svg>
-                    </div>
-                </div>
             </section>
 
             <!-- Technology Overview -->
@@ -234,7 +233,7 @@
                         </p>
                     </div>
 
-                    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10 lg:gap-12">
                         <div class="feature-card">
                             <div
                                 class="w-16 h-16 bg-gradient-to-r from-zky-blue to-zky-purple rounded-lg flex items-center justify-center mb-6"

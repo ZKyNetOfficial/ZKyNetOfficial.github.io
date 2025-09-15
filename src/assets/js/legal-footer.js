@@ -43,7 +43,7 @@ function renderLegalFooter() {
         <footer class="bg-zky-dark py-16 border-t border-slate-800">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <p class="text-gray-400">© 2025 ZKyNet™. All rights reserved.</p>
-                <div class="mt-4 flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-6">
+                <div class="mt-4 flex flex-col sm:flex-row justify-center md:justify-end space-y-3 sm:space-y-0 sm:space-x-6">
                     ${navigationLinks.join('\n                    ')}
                 </div>
             </div>

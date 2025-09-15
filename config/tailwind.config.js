@@ -6,6 +6,15 @@ module.exports = {
         '../src/assets/js/**/*.js',
         '../src/assets/**/*.{js,ts,jsx,tsx,vue}'
     ],
+    safelist: [
+        'md:justify-end',
+        'justify-end',
+        'space-y-2',
+        'space-y-3',
+        'sm:space-y-0',
+        'sm:space-x-6',
+        'md:mt-0'
+    ],
     theme: {
         extend: {
             colors: {
