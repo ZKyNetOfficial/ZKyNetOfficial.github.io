@@ -33,8 +33,7 @@ window.handleContactForm = async function handleContactForm(data) {
     try {
         ZKyNet.zkynetErrorHandler.logInfo(context, 'Starting contact form submission', {
             hasName: !!(data.firstName && data.lastName),
-            hasSubject: !!data.subject,
-            hasMessage: !!data.message
+            hasSubject: !!data.subject
         });
 
         // Show loading state
@@ -47,8 +46,7 @@ window.handleContactForm = async function handleContactForm(data) {
         const contactData = {
             name: `${data.firstName} ${data.lastName}`.trim(),
             company: data.company || '',
-            subject: data.subject,
-            message: data.message
+            subject: data.subject
         };
 
         ZKyNet.zkynetErrorHandler.logInfo(context, 'Contact data prepared', {
@@ -76,7 +74,7 @@ window.handleContactForm = async function handleContactForm(data) {
     } finally {
         // Reset button state
         if (submitButton) {
-            submitButton.textContent = originalText || 'Send Message';
+            submitButton.textContent = originalText || 'Draft Email';
             submitButton.disabled = false;
         }
     }
@@ -270,7 +268,7 @@ window.openEmailClient = function openEmailClient(service, contactData) {
         // Close modal and show success message
         window.closeEmailServiceModal();
         ZKyNet.zkynetErrorHandler.showUserSuccess(
-            'Opening your email service. Please send the email to complete your inquiry.'
+            'Email draft opened! Please compose your message and send it to complete your inquiry.'
         );
     } catch (error) {
         ZKyNet.zkynetErrorHandler.logError(context, error, {
@@ -291,18 +289,13 @@ window.openEmailClient = function openEmailClient(service, contactData) {
 window.createEmailTemplate = function createEmailTemplate(contactData) {
     return `Hello ZKyNet Team,
 
-My inquiry details:
+Contact Information:
+Name: ${contactData.name}${contactData.company ? `\nCompany: ${contactData.company}` : ''}
 
-Name: ${contactData.name}
-${contactData.company ? `Company: ${contactData.company}\n` : ''}
-Message:
-${contactData.message}
+Please compose your message below.
 
 Best regards,
-${contactData.name}
-
----
-This email was generated through the ZKyNet contact form.`;
+${contactData.name}`;
 };
 
 // Functions are already available on window object for inline onclick handlers
