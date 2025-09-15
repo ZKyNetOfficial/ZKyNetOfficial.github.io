@@ -101,8 +101,7 @@ window.showEmailServiceModal = function showEmailServiceModal(contactData) {
                     <p style="color: #d1d5db; margin-bottom: 1.5rem;">Select your preferred email service to send your message:</p>
                     
                     <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                        <button onclick="window.openEmailClient('mailto', ${JSON.stringify(contactData).replace(/"/g, '&quot;')})" 
-                                class="email-service-option">
+                        <button data-service="mailto" class="email-service-option email-service-btn">
                             <div style="display: flex; align-items: center; gap: 0.75rem;">
                                 <div class="email-service-icon mailto-icon">
                                     <svg style="width: 1rem; height: 1rem;" fill="currentColor" viewBox="0 0 20 20">
@@ -120,8 +119,7 @@ window.showEmailServiceModal = function showEmailServiceModal(contactData) {
                             </svg>
                         </button>
 
-                        <button onclick="window.openEmailClient('gmail', ${JSON.stringify(contactData).replace(/"/g, '&quot;')})" 
-                                class="email-service-option">
+                        <button data-service="gmail" class="email-service-option email-service-btn">
                             <div style="display: flex; align-items: center; gap: 0.75rem;">
                                 <div class="email-service-icon gmail-icon">G</div>
                                 <div class="email-service-info">
@@ -134,8 +132,7 @@ window.showEmailServiceModal = function showEmailServiceModal(contactData) {
                             </svg>
                         </button>
 
-                        <button onclick="window.openEmailClient('outlook', ${JSON.stringify(contactData).replace(/"/g, '&quot;')})" 
-                                class="email-service-option">
+                        <button data-service="outlook" class="email-service-option email-service-btn">
                             <div style="display: flex; align-items: center; gap: 0.75rem;">
                                 <div class="email-service-icon outlook-icon">O</div>
                                 <div class="email-service-info">
@@ -148,8 +145,7 @@ window.showEmailServiceModal = function showEmailServiceModal(contactData) {
                             </svg>
                         </button>
 
-                        <button onclick="window.openEmailClient('yahoo', ${JSON.stringify(contactData).replace(/"/g, '&quot;')})" 
-                                class="email-service-option">
+                        <button data-service="yahoo" class="email-service-option email-service-btn">
                             <div style="display: flex; align-items: center; gap: 0.75rem;">
                                 <div class="email-service-icon yahoo-icon">Y</div>
                                 <div class="email-service-info">
@@ -168,6 +164,15 @@ window.showEmailServiceModal = function showEmailServiceModal(contactData) {
     `;
 
     document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // Add event listeners to email service buttons
+    const emailServiceButtons = document.querySelectorAll('.email-service-btn');
+    emailServiceButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const service = this.getAttribute('data-service');
+            window.openEmailClient(service, contactData);
+        });
+    });
 
     // Add escape key listener
     document.addEventListener('keydown', window.handleModalEscapeKey);

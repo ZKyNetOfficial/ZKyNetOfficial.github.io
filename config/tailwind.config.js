@@ -13,7 +13,21 @@ module.exports = {
         'space-y-3',
         'sm:space-y-0',
         'sm:space-x-6',
-        'md:mt-0'
+        'md:mt-0',
+        // Modal classes (dynamically created in JavaScript)
+        'modal-backdrop',
+        'modal-content',
+        'modal-header',
+        'modal-title',
+        'modal-close-btn',
+        'email-service-option',
+        'email-service-btn',
+        'email-service-icon',
+        'email-service-info',
+        'mailto-icon',
+        'gmail-icon',
+        'outlook-icon',
+        'yahoo-icon'
     ],
     theme: {
         extend: {
