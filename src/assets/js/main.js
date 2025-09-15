@@ -31,10 +31,10 @@ class ErrorHandler {
 
         // Only enable debug mode on explicit localhost or with explicit debug flags
         return (
-            window.location.hostname === 'localhost'
-            || window.location.hostname === '127.0.0.1'
-            || window.location.search.includes('debug=true')
-            || localStorage.getItem('zkynet-debug') === 'true'
+            window.location.hostname === 'localhost' ||
+            window.location.hostname === '127.0.0.1' ||
+            window.location.search.includes('debug=true') ||
+            localStorage.getItem('zkynet-debug') === 'true'
         );
     }
 
@@ -246,10 +246,10 @@ class ErrorHandler {
      */
     isLocalDevelopment() {
         return (
-            window.location.hostname === 'localhost'
-            || window.location.hostname === '127.0.0.1'
-            || window.location.hostname.includes('192.168')
-            || window.location.port !== ''
+            window.location.hostname === 'localhost' ||
+            window.location.hostname === '127.0.0.1' ||
+            window.location.hostname.includes('192.168') ||
+            window.location.port !== ''
         );
     }
 

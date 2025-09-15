@@ -1,18 +1,18 @@
 function getBasePath() {
     const currentPath = window.location.pathname;
-    
+
     // For index.html or root path, use 'src/' prefix
     if (currentPath === '/' || currentPath.includes('index.html')) {
         return 'src/';
     }
-    
+
     // For pages in src/ directory, use relative paths without prefix
     return '';
 }
 
 function renderFooter() {
     const basePath = getBasePath();
-    
+
     const newsletterSection = `
         <!-- Email Signup CTA -->
         <section id="newsletter" class="py-20 gradient-bg">
@@ -24,17 +24,17 @@ function renderFooter() {
                 </p>
 
                 <form id="newsletter-form" class="max-w-md mx-auto">
-                    <div class="flex gap-4 mb-4">
+                    <div class="flex flex-col sm:flex-row gap-4 mb-4">
                         <input
                             type="email"
                             name="email"
                             placeholder="Enter your email"
-                            class="flex-grow px-6 py-4 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                            class="w-full sm:flex-grow px-6 py-4 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-400"
                             required
                         />
                         <button
                             type="submit"
-                            class="bg-white text-zky-purple px-8 py-4 rounded-lg font-semibold hover-scale hover:shadow-xl transition-all duration-300"
+                            class="w-full sm:w-auto bg-white text-zky-purple px-8 py-4 rounded-lg font-semibold hover-scale hover:shadow-xl transition-all duration-300 min-h-[44px] flex items-center justify-center"
                         >
                             Subscribe
                         </button>
@@ -72,7 +72,7 @@ function renderFooter() {
         <!-- Footer -->
         <footer class="bg-zky-dark py-16 border-t border-slate-800">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid md:grid-cols-4 gap-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                     <div>
                         <div class="flex items-center space-x-3 mb-4">
                             <img
@@ -90,32 +90,32 @@ function renderFooter() {
 
                     <div>
                         <h3 class="text-white font-semibold mb-4">Technology</h3>
-                        <ul class="space-y-2">
+                        <ul class="space-y-3">
                             <li>
                                 <a
                                     href="${basePath}technology.html"
-                                    class="text-gray-400 hover:text-white transition-colors"
+                                    class="text-gray-400 hover:text-white transition-colors py-1 inline-block min-h-[44px] flex items-center"
                                     >Overview</a
                                 >
                             </li>
                             <li>
                                 <a
                                     href="${basePath}technology.html#zk-proofs"
-                                    class="text-gray-400 hover:text-white transition-colors"
+                                    class="text-gray-400 hover:text-white transition-colors py-1 inline-block min-h-[44px] flex items-center"
                                     >Zero-Knowledge Proofs</a
                                 >
                             </li>
                             <li>
                                 <a
                                     href="${basePath}technology.html#privacy"
-                                    class="text-gray-400 hover:text-white transition-colors"
+                                    class="text-gray-400 hover:text-white transition-colors py-1 inline-block min-h-[44px] flex items-center"
                                     >Dynamic Privacy</a
                                 >
                             </li>
                             <li>
                                 <a
                                     href="${basePath}technology.html#rust"
-                                    class="text-gray-400 hover:text-white transition-colors"
+                                    class="text-gray-400 hover:text-white transition-colors py-1 inline-block min-h-[44px] flex items-center"
                                     >Rust Implementation</a
                                 >
                             </li>
@@ -124,32 +124,32 @@ function renderFooter() {
 
                     <div>
                         <h3 class="text-white font-semibold mb-4">Products</h3>
-                        <ul class="space-y-2">
+                        <ul class="space-y-3">
                             <li>
                                 <a
                                     href="${basePath}products.html"
-                                    class="text-gray-400 hover:text-white transition-colors"
+                                    class="text-gray-400 hover:text-white transition-colors py-1 inline-block min-h-[44px] flex items-center"
                                     >Overview</a
                                 >
                             </li>
                             <li>
                                 <a
                                     href="${basePath}products.html#consumer"
-                                    class="text-gray-400 hover:text-white transition-colors"
+                                    class="text-gray-400 hover:text-white transition-colors py-1 inline-block min-h-[44px] flex items-center"
                                     >Consumer VPN</a
                                 >
                             </li>
                             <li>
                                 <a
                                     href="${basePath}products.html#enterprise"
-                                    class="text-gray-400 hover:text-white transition-colors"
+                                    class="text-gray-400 hover:text-white transition-colors py-1 inline-block min-h-[44px] flex items-center"
                                     >Enterprise Solutions</a
                                 >
                             </li>
                             <li>
                                 <a
                                     href="${basePath}products.html#node"
-                                    class="text-gray-400 hover:text-white transition-colors"
+                                    class="text-gray-400 hover:text-white transition-colors py-1 inline-block min-h-[44px] flex items-center"
                                     >Node Operations</a
                                 >
                             </li>
@@ -158,18 +158,18 @@ function renderFooter() {
 
                     <div>
                         <h3 class="text-white font-semibold mb-4">Connect</h3>
-                        <ul class="space-y-2">
+                        <ul class="space-y-3">
                             <li>
                                 <a
                                     href="${basePath}contact.html"
-                                    class="text-gray-400 hover:text-white transition-colors"
+                                    class="text-gray-400 hover:text-white transition-colors py-1 inline-block min-h-[44px] flex items-center"
                                     >Contact</a
                                 >
                             </li>
                             <li>
                                 <a
                                     href="https://github.com/ZKyNetOfficial"
-                                    class="text-gray-400 hover:text-white transition-colors"
+                                    class="text-gray-400 hover:text-white transition-colors py-1 inline-block min-h-[44px] flex items-center"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     >GitHub</a
@@ -178,14 +178,14 @@ function renderFooter() {
                             <li>
                                 <a
                                     href="${basePath}docs/documentation.html"
-                                    class="text-gray-400 hover:text-white transition-colors"
+                                    class="text-gray-400 hover:text-white transition-colors py-1 inline-block min-h-[44px] flex items-center"
                                     >Documentation</a
                                 >
                             </li>
                             <li>
                                 <a
                                     href="https://reddit.com/u/ZKyNetOfficial"
-                                    class="text-gray-400 hover:text-white transition-colors"
+                                    class="text-gray-400 hover:text-white transition-colors py-1 inline-block min-h-[44px] flex items-center"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     >Reddit</a
@@ -198,15 +198,15 @@ function renderFooter() {
                 <div class="border-t border-slate-800 mt-12 pt-8">
                     <div class="flex flex-col md:flex-row justify-between items-center">
                         <p class="text-gray-400 text-sm">© 2025 ZKyNet™. All rights reserved.</p>
-                        <div class="flex space-x-6 mt-4 md:mt-0">
+                        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-6 mt-4 md:mt-0">
                             <a
                                 href="${basePath}legal/privacy-policy.html"
-                                class="text-gray-400 hover:text-white text-sm transition-colors"
+                                class="text-gray-400 hover:text-white text-sm transition-colors py-2 px-1 min-h-[44px] flex items-center justify-center sm:justify-start"
                                 >Privacy Policy</a
                             >
                             <a
                                 href="${basePath}legal/terms-mvp.html"
-                                class="text-gray-400 hover:text-white text-sm transition-colors"
+                                class="text-gray-400 hover:text-white text-sm transition-colors py-2 px-1 min-h-[44px] flex items-center justify-center sm:justify-start"
                                 >Terms of Service</a
                             >
                         </div>
@@ -223,13 +223,15 @@ function initializeFooter() {
     const footerContainer = document.getElementById('footer-container');
     if (footerContainer) {
         footerContainer.innerHTML = renderFooter();
-        
+
         // Initialize newsletter form after footer is rendered
         if (window.initializeNewsletterForm) {
             window.initializeNewsletterForm();
         }
     } else {
-        console.warn('Footer container not found. Add <div id="footer-container"></div> to your HTML.');
+        console.warn(
+            'Footer container not found. Add <div id="footer-container"></div> to your HTML.'
+        );
     }
 }
 

@@ -40,12 +40,61 @@
                             </span>
                         </a>
                     </div>
+                    <!-- Desktop Navigation -->
                     <div class="hidden md:block">
                         <a
                             href="../../index.html"
                             class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
                         >
                             Back to Website
+                        </a>
+                    </div>
+
+                    <!-- Mobile menu button -->
+                    <div class="md:hidden">
+                        <button
+                            id="mobile-menu-btn"
+                            type="button"
+                            class="text-white hover:text-cyan-400"
+                            aria-label="Open mobile navigation menu"
+                        >
+                            <svg
+                                class="h-6 w-6"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M4 6h16M4 12h16M4 18h16"
+                                ></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mobile menu -->
+                <div id="mobile-menu" class="hidden md:hidden pb-4 bg-black/20 rounded-lg mt-4">
+                    <div class="flex flex-col space-y-1 p-4">
+                        <a
+                            href="../../index.html"
+                            class="nav-link text-white hover:text-cyan-400 transition-colors py-3 px-2 rounded hover:bg-black/20"
+                        >
+                            Back to Website
+                        </a>
+                        <a
+                            href="terms-mvp.html"
+                            class="nav-link text-white hover:text-cyan-400 transition-colors py-3 px-2 rounded hover:bg-black/20"
+                        >
+                            Terms of Service
+                        </a>
+                        <a
+                            href="terms-future.html"
+                            class="nav-link text-white hover:text-cyan-400 transition-colors py-3 px-2 rounded hover:bg-black/20"
+                        >
+                            Future Terms
                         </a>
                     </div>
                 </div>
@@ -816,8 +865,9 @@
 
         <!-- Legal Footer Container -->
         <div id="legal-footer-container"></div>
-        
+
         <!-- JavaScript -->
+        <script src="../assets/js/main.js"></script>
         <script src="../assets/js/legal-footer.js"></script>
     </body>
 </html>
