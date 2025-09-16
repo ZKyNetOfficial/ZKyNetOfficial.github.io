@@ -1,7 +1,15 @@
 /**
  * ZKyNet Landing Page - Contact Form Handler
- * Email service modal and form functionality
+ * Email service modal and form functionality with mobile detection
  */
+
+/**
+ * Simple mobile device detection
+ * @returns {boolean} True if mobile device detected
+ */
+window.isMobileDevice = function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+};
 
 // Initialize contact form when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
@@ -81,10 +89,83 @@ window.handleContactForm = async function handleContactForm(data) {
 };
 
 /**
- * Show email service selection modal
+ * Show email service selection modal or mobile contact info
  * @param {Object} contactData - Contact form data object
  */
 window.showEmailServiceModal = function showEmailServiceModal(contactData) {
+    // Check if mobile device
+    if (window.isMobileDevice()) {
+        window.showMobileContactModal(contactData);
+    } else {
+        window.showDesktopEmailServiceModal(contactData);
+    }
+};
+
+/**
+ * Show mobile-specific contact information modal
+ * @param {Object} contactData - Contact form data object
+ */
+window.showMobileContactModal = function showMobileContactModal(contactData) {
+    const modalHtml = `
+        <div id="email-service-modal" class="modal-backdrop" onclick="handleModalBackdropClick(event)">
+            <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 520px;">
+                <div class="modal-header">
+                    <h2 class="modal-title">Contact Information</h2>
+                    <button onclick="closeEmailServiceModal()" class="modal-close-btn">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div style="padding: 0 1rem 1rem; text-align: center;">
+                    <div style="margin-bottom: 1.5rem;">
+                        <div style="width: 64px; height: 64px; background: linear-gradient(135deg, #1e3a8a, #7c3aed); border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center;">
+                            <svg style="width: 32px; height: 32px; color: white;" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
+                                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
+                            </svg>
+                        </div>
+                        <h3 style="color: #ffffff; font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">Email Service Unavailable</h3>
+                        <p style="color: #d1d5db; margin-bottom: 1.5rem;">We apologize, but the email client could not be opened. Please contact us directly using the email address below:</p>
+                    </div>
+                    
+                    <div style="background: #1f2937; border: 1px solid #374151; border-radius: 0.75rem; padding: 1.25rem; margin-bottom: 1.5rem;">
+                        <div style="margin-bottom: 1rem;">
+                            <div style="color: #ffffff; font-family: monospace; font-size: 0.95rem; margin-bottom: 1rem; word-break: break-all;">
+                                contact@zkynet.org
+                            </div>
+                            <div style="display: flex; justify-content: center;">
+                                <button id="copy-email-btn" onclick="copyEmailToClipboard()" style="background: #374151; color: #ffffff; border: 1px solid #4b5563; border-radius: 0.5rem; padding: 0.75rem 2rem; font-size: 0.875rem; cursor: pointer; transition: all 0.2s;">
+                                    📧 Copy Email Address
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p style="color: #9ca3af; font-size: 0.875rem; line-height: 1.5;">
+                        Thank you for your interest in ZKyNet.<br>
+                        We typically respond within 24-48 hours.
+                    </p>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // Store contact data for copy functions
+    window.mobileContactData = contactData;
+
+    // Add escape key listener
+    document.addEventListener('keydown', window.handleModalEscapeKey);
+};
+
+/**
+ * Show desktop email service selection modal
+ * @param {Object} contactData - Contact form data object
+ */
+window.showDesktopEmailServiceModal = function showDesktopEmailServiceModal(contactData) {
     const modalHtml = `
         <div id="email-service-modal" class="modal-backdrop" onclick="handleModalBackdropClick(event)">
             <div class="modal-content" onclick="event.stopPropagation()">
@@ -283,6 +364,119 @@ window.openEmailClient = function openEmailClient(service, contactData) {
         ZKyNet.zkynetErrorHandler.showUserError(
             'Failed to open email client. Please try a different service or contact us directly.'
         );
+    }
+};
+
+/**
+ * Copy email address to clipboard (mobile)
+ */
+window.copyEmailToClipboard = function copyEmailToClipboard() {
+    const email = 'contact@zkynet.org';
+    
+    if (navigator.clipboard && window.isSecureContext) {
+        // Use modern clipboard API
+        navigator.clipboard.writeText(email).then(() => {
+            window.showCopySuccess('copy-email-btn', '📧 Copied!');
+        }).catch(() => {
+            window.fallbackCopyToClipboard(email, 'copy-email-btn');
+        });
+    } else {
+        // Fallback for older browsers
+        window.fallbackCopyToClipboard(email, 'copy-email-btn');
+    }
+};
+
+/**
+ * Copy complete contact information to clipboard (mobile)
+ */
+window.copyContactInfoToClipboard = function copyContactInfoToClipboard() {
+    if (!window.mobileContactData) {
+        window.copyEmailToClipboard();
+        return;
+    }
+
+    const contactData = window.mobileContactData;
+    const subjectMap = {
+        enterprise: 'Enterprise Partnership',
+        technical: 'Technical Support',
+        investment: 'Investment Opportunity',
+        media: 'Media & Press',
+        general: 'General Inquiry',
+        other: 'Other'
+    };
+    const subjectText = subjectMap[contactData.subject] || contactData.subject;
+    
+    const contactInfo = `Contact Information for ZKyNet:
+
+Email: contact@zkynet.org
+Subject: ZKyNet Inquiry: ${subjectText}
+
+From: ${contactData.name}${contactData.company ? `
+Company: ${contactData.company}` : ''}
+
+[Please compose your message here]
+
+Best regards,
+${contactData.name}`;
+
+    if (navigator.clipboard && window.isSecureContext) {
+        // Use modern clipboard API
+        navigator.clipboard.writeText(contactInfo).then(() => {
+            window.showCopySuccess('copy-all-btn', '📋 Copied All!');
+        }).catch(() => {
+            window.fallbackCopyToClipboard(contactInfo, 'copy-all-btn');
+        });
+    } else {
+        // Fallback for older browsers
+        window.fallbackCopyToClipboard(contactInfo, 'copy-all-btn');
+    }
+};
+
+/**
+ * Fallback copy method for older browsers
+ * @param {string} text - Text to copy
+ * @param {string} buttonId - Button ID to show feedback
+ */
+window.fallbackCopyToClipboard = function fallbackCopyToClipboard(text, buttonId) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        document.execCommand('copy');
+        const isEmail = buttonId === 'copy-email-btn';
+        window.showCopySuccess(buttonId, isEmail ? '📧 Copied!' : '📋 Copied All!');
+    } catch (err) {
+        console.error('Failed to copy to clipboard:', err);
+        window.showCopySuccess(buttonId, '❌ Copy failed');
+    }
+    
+    document.body.removeChild(textArea);
+};
+
+/**
+ * Show copy success feedback
+ * @param {string} buttonId - Button ID to update
+ * @param {string} successText - Text to show on success
+ */
+window.showCopySuccess = function showCopySuccess(buttonId, successText) {
+    const button = document.getElementById(buttonId);
+    if (button) {
+        const originalText = button.textContent;
+        button.textContent = successText;
+        button.style.background = '#065f46';
+        button.style.borderColor = '#047857';
+        
+        setTimeout(() => {
+            button.textContent = originalText;
+            button.style.background = '#374151';
+            button.style.borderColor = '#4b5563';
+        }, 2000);
     }
 };
 
