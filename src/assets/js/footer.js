@@ -197,7 +197,10 @@ function renderFooter() {
 
                 <div class="border-t border-slate-800 mt-12 pt-8">
                     <div class="flex flex-col md:flex-row justify-between items-center">
-                        <p class="text-gray-400 text-sm">© 2025 ZKyNet™. All rights reserved.</p>
+                        <div class="text-gray-400 text-sm">
+                            <p>© 2025 ZKyNet™. All rights reserved.</p>
+                            <p class="mt-1">17204671 Canada Inc.</p>
+                        </div>
                         <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-6 mt-4 md:mt-0 justify-center md:justify-end">
                             <a
                                 href="${basePath}legal/privacy-policy.html"
