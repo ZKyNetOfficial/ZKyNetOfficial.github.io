@@ -764,7 +764,7 @@ window.handleNewsletterSubmission = async function handleNewsletterSubmission(da
 
         // Show loading state
         if (submitButton) {
-            submitButton.textContent = 'Subscribing...';
+            submitButton.textContent = 'Signing up...';
             submitButton.disabled = true;
         }
 
@@ -828,7 +828,7 @@ window.handleNewsletterSubmission = async function handleNewsletterSubmission(da
                 }
 
                 zkynetErrorHandler.showUserSuccess(
-                    "Successfully subscribed to our newsletter! You'll be the first to know about ZKyNet updates."
+                    "You're on the list! We'll let you know when ZKyNet is ready."
                 );
 
                 // Clear the form
@@ -869,7 +869,7 @@ window.handleNewsletterSubmission = async function handleNewsletterSubmission(da
     } finally {
         // Reset button state
         if (submitButton) {
-            submitButton.textContent = originalText || 'Subscribe';
+            submitButton.textContent = originalText || 'Get Early Access';
             submitButton.disabled = false;
         }
         zkynetErrorHandler.logInfo(context, 'Newsletter submission completed');
@@ -1087,6 +1087,26 @@ window.enableGlobalDebugFunctions = function enableGlobalDebugFunctions() {
     console.info('🔧 ZKyNet Debug Mode Enabled'); // eslint-disable-line no-console
     console.info('Available functions:', Object.keys(window.ZKyNetDebug)); // eslint-disable-line no-console
     console.info('Add ?debug=true to URL to show debug panel'); // eslint-disable-line no-console
+};
+
+/**
+ * FAQ accordion toggle
+ * @param {HTMLElement} button - The clicked FAQ question button
+ */
+window.toggleFaq = function toggleFaq(button) {
+    const faqItem = button.parentElement;
+    const isActive = faqItem.classList.contains('active');
+
+    // Close all FAQ items in the same container
+    const container = faqItem.parentElement;
+    container.querySelectorAll('.faq-item').forEach(item => {
+        item.classList.remove('active');
+    });
+
+    // Open clicked item if it wasn't already open
+    if (!isActive) {
+        faqItem.classList.add('active');
+    }
 };
 
 // Export functions for use in other modules

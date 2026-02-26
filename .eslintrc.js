@@ -189,7 +189,7 @@ module.exports = {
         },
         {
             // Stricter rules for main application code
-            files: ['src/assets/js/main.js', 'src/assets/js/contact.js'],
+            files: ['src/assets/js/main.js'],
             rules: {
                 complexity: ['warn', 10],
                 'max-depth': ['warn', 4],

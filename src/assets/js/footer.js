@@ -6,21 +6,42 @@ function getBasePath() {
         return 'src/';
     }
 
+    // For pages in legal/ subdirectory, go up one level
+    if (currentPath.includes('/legal/')) {
+        return '../';
+    }
+
     // For pages in src/ directory, use relative paths without prefix
     return '';
 }
 
+function getHomePath() {
+    const currentPath = window.location.pathname;
+
+    if (currentPath === '/' || currentPath.includes('index.html')) {
+        return '';
+    }
+
+    if (currentPath.includes('/legal/')) {
+        return '../../';
+    }
+
+    return '../';
+}
+
 function renderFooter() {
     const basePath = getBasePath();
+    const homePath = getHomePath();
 
     const newsletterSection = `
         <!-- Email Signup CTA -->
         <section id="newsletter" class="py-20 gradient-bg">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">Stay Updated</h2>
+                <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">
+                    One interface. Every tunnel.
+                </h2>
                 <p class="text-xl text-gray-200 mb-8">
-                    Be the first to know about ZKyNet developments, beta releases, and privacy
-                    infrastructure innovations
+                    Sign up for early access. We'll let you know when ZKyNet is ready.
                 </p>
 
                 <form id="newsletter-form" class="max-w-md mx-auto">
@@ -36,33 +57,13 @@ function renderFooter() {
                             type="submit"
                             class="w-full sm:w-auto bg-white text-zky-purple px-8 py-4 rounded-lg font-semibold hover-scale hover:shadow-xl transition-all duration-300 min-h-[44px] flex items-center justify-center"
                         >
-                            Subscribe
+                            Get Early Access
                         </button>
-                    </div>
-                    <div class="flex items-start space-x-2 text-sm">
-                        <input
-                            type="checkbox"
-                            id="newsletter-terms"
-                            name="terms"
-                            required
-                            class="mt-1 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
-                        />
-                        <label for="newsletter-terms" class="text-gray-300">
-                            I agree to the
-                            <a
-                                href="${basePath}legal/privacy-policy.html"
-                                class="text-blue-400 hover:text-blue-300 underline"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                >Privacy Policy</a
-                            >
-                            and consent to receiving marketing communications from ZKyNet.
-                        </label>
                     </div>
                 </form>
 
                 <p class="text-sm text-gray-300 mt-4">
-                    We respect your privacy. Unsubscribe at any time.
+                    No spam. Unsubscribe anytime. We respect your inbox like we respect your traffic.
                 </p>
             </div>
         </section>
@@ -80,90 +81,56 @@ function renderFooter() {
                                 alt="ZKyNet Logo"
                                 class="h-8 w-8"
                             />
-                            <span class="text-xl font-bold text-white">ZKyNet™</span>
+                            <span class="text-xl font-bold text-white">ZKyNet</span>
                         </div>
                         <p class="text-gray-400 text-sm">
-                            Next-generation privacy infrastructure combining anonymity with legal
-                            compliance.
+                            System-wide encrypted tunnel management.
+                            Run multiple tunnels. Route traffic your way.
                         </p>
                     </div>
 
                     <div>
-                        <h3 class="text-white font-semibold mb-4">Technology</h3>
+                        <h3 class="text-white font-semibold mb-4">Product</h3>
                         <ul class="space-y-3">
                             <li>
                                 <a
-                                    href="${basePath}technology.html"
+                                    href="${homePath}index.html#how-it-works"
                                     class="text-gray-400 hover:text-white transition-colors py-1 inline-block min-h-[44px] flex items-center"
-                                    >Overview</a
+                                    >How It Works</a
                                 >
                             </li>
                             <li>
                                 <a
-                                    href="${basePath}technology.html#zk-proofs"
+                                    href="${homePath}index.html#features"
                                     class="text-gray-400 hover:text-white transition-colors py-1 inline-block min-h-[44px] flex items-center"
-                                    >Zero-Knowledge Proofs</a
+                                    >Features</a
                                 >
                             </li>
                             <li>
                                 <a
-                                    href="${basePath}technology.html#privacy"
+                                    href="${homePath}index.html#faq"
                                     class="text-gray-400 hover:text-white transition-colors py-1 inline-block min-h-[44px] flex items-center"
-                                    >Dynamic Privacy</a
-                                >
-                            </li>
-                            <li>
-                                <a
-                                    href="${basePath}technology.html#rust"
-                                    class="text-gray-400 hover:text-white transition-colors py-1 inline-block min-h-[44px] flex items-center"
-                                    >Rust Implementation</a
+                                    >FAQ</a
                                 >
                             </li>
                         </ul>
                     </div>
 
                     <div>
-                        <h3 class="text-white font-semibold mb-4">Products</h3>
+                        <h3 class="text-white font-semibold mb-4">Company</h3>
                         <ul class="space-y-3">
                             <li>
                                 <a
-                                    href="${basePath}products.html"
+                                    href="${basePath}about.html"
                                     class="text-gray-400 hover:text-white transition-colors py-1 inline-block min-h-[44px] flex items-center"
-                                    >Overview</a
+                                    >About</a
                                 >
                             </li>
                             <li>
                                 <a
-                                    href="${basePath}products.html#consumer"
+                                    href="${basePath}support.html"
                                     class="text-gray-400 hover:text-white transition-colors py-1 inline-block min-h-[44px] flex items-center"
-                                    >Consumer VPN</a
-                                >
-                            </li>
-                            <li>
-                                <a
-                                    href="${basePath}products.html#enterprise"
-                                    class="text-gray-400 hover:text-white transition-colors py-1 inline-block min-h-[44px] flex items-center"
-                                    >Enterprise Solutions</a
-                                >
-                            </li>
-                            <li>
-                                <a
-                                    href="${basePath}products.html#node"
-                                    class="text-gray-400 hover:text-white transition-colors py-1 inline-block min-h-[44px] flex items-center"
-                                    >Node Operations</a
-                                >
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h3 class="text-white font-semibold mb-4">Connect</h3>
-                        <ul class="space-y-3">
-                            <li>
-                                <a
-                                    href="${basePath}contact.html"
-                                    class="text-gray-400 hover:text-white transition-colors py-1 inline-block min-h-[44px] flex items-center"
-                                    >Contact</a
+                                    >Support</a
                                 >
                             </li>
                             <li>
@@ -175,20 +142,24 @@ function renderFooter() {
                                     >GitHub</a
                                 >
                             </li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="text-white font-semibold mb-4">Legal</h3>
+                        <ul class="space-y-3">
                             <li>
                                 <a
-                                    href="${basePath}docs/documentation.html"
+                                    href="${basePath}legal/privacy.html"
                                     class="text-gray-400 hover:text-white transition-colors py-1 inline-block min-h-[44px] flex items-center"
-                                    >Documentation</a
+                                    >Privacy Policy</a
                                 >
                             </li>
                             <li>
                                 <a
-                                    href="https://reddit.com/u/ZKyNetOfficial"
+                                    href="${basePath}legal/terms.html"
                                     class="text-gray-400 hover:text-white transition-colors py-1 inline-block min-h-[44px] flex items-center"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    >Reddit</a
+                                    >Terms of Service</a
                                 >
                             </li>
                         </ul>
@@ -198,17 +169,17 @@ function renderFooter() {
                 <div class="border-t border-slate-800 mt-12 pt-8">
                     <div class="flex flex-col md:flex-row justify-between items-center">
                         <div class="text-gray-400 text-sm">
-                            <p>© 2025 ZKyNet™. All rights reserved.</p>
+                            <p>&copy; 2025 ZKyNet. All rights reserved.</p>
                             <p class="mt-1">17204671 Canada Inc.</p>
                         </div>
                         <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-6 mt-4 md:mt-0 justify-center md:justify-end">
                             <a
-                                href="${basePath}legal/privacy-policy.html"
+                                href="${basePath}legal/privacy.html"
                                 class="text-gray-400 hover:text-white text-sm transition-colors py-2 px-1 min-h-[44px] flex items-center justify-center"
                                 >Privacy Policy</a
                             >
                             <a
-                                href="${basePath}legal/terms-mvp.html"
+                                href="${basePath}legal/terms.html"
                                 class="text-gray-400 hover:text-white text-sm transition-colors py-2 px-1 min-h-[44px] flex items-center justify-center"
                                 >Terms of Service</a
                             >

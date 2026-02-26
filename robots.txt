@@ -9,8 +9,7 @@ Allow: /index.html
 Allow: /Logo/
 Allow: /_config.yml
 
-# No restrictions for privacy-focused startup
-# We want good SEO visibility for our privacy infrastructure
+# Allow all crawlers full access
 
 # Common crawlers
 User-agent: Googlebot
