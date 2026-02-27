@@ -135,11 +135,11 @@ function renderFooter() {
                             </li>
                             <li>
                                 <a
-                                    href="https://github.com/ZKyNetOfficial"
+                                    href="https://reddit.com/u/ZKyNetOfficial"
                                     class="text-gray-400 hover:text-white transition-colors py-1 inline-block min-h-[44px] flex items-center"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    >GitHub</a
+                                    >Reddit</a
                                 >
                             </li>
                         </ul>
@@ -162,6 +162,13 @@ function renderFooter() {
                                     >Terms of Service</a
                                 >
                             </li>
+                            <li>
+                                <a
+                                    href="${basePath}legal/refund.html"
+                                    class="text-gray-400 hover:text-white transition-colors py-1 inline-block min-h-[44px] flex items-center"
+                                    >Refund Policy</a
+                                >
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -169,8 +176,9 @@ function renderFooter() {
                 <div class="border-t border-slate-800 mt-12 pt-8">
                     <div class="flex flex-col md:flex-row justify-between items-center">
                         <div class="text-gray-400 text-sm">
-                            <p>&copy; 2025 ZKyNet. All rights reserved.</p>
-                            <p class="mt-1">17204671 Canada Inc.</p>
+                            <p>&copy; 2026 17204671 Canada Inc. (ZKyNet). All rights reserved.</p>
+                            <p class="mt-1">155-2 King Street West, Unit #299, Hamilton, ON L8P 4S0, Canada</p>
+                            <p class="mt-1">contact@zkynet.org</p>
                         </div>
                         <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-6 mt-4 md:mt-0 justify-center md:justify-end">
                             <a
@@ -182,6 +190,11 @@ function renderFooter() {
                                 href="${basePath}legal/terms.html"
                                 class="text-gray-400 hover:text-white text-sm transition-colors py-2 px-1 min-h-[44px] flex items-center justify-center"
                                 >Terms of Service</a
+                            >
+                            <a
+                                href="${basePath}legal/refund.html"
+                                class="text-gray-400 hover:text-white text-sm transition-colors py-2 px-1 min-h-[44px] flex items-center justify-center"
+                                >Refund Policy</a
                             >
                         </div>
                     </div>

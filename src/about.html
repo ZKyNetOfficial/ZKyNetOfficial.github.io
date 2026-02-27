@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>About ZKyNet — Why We're Building This</title>
+        <title>About ZKyNet - Why We're Building This</title>
         <meta
             name="description"
             content="ZKyNet is building a system-wide encrypted tunnel management platform. Learn why this product category needs to exist."
@@ -14,13 +14,13 @@
         />
 
         <!-- Open Graph Meta Tags -->
-        <meta property="og:title" content="About ZKyNet — Why We're Building This" />
+        <meta property="og:title" content="About ZKyNet - Why We're Building This" />
         <meta
             property="og:description"
             content="ZKyNet is building a system-wide encrypted tunnel management platform. Learn why this product category needs to exist."
         />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://zkynet.github.io/src/about.html" />
+        <meta property="og:url" content="https://zkynet.org/src/about.html" />
         <meta property="og:image" content="./assets/images/zkynet-logo-512x512.png" />
 
         <!-- Favicon -->
@@ -170,10 +170,10 @@
                             Every VPN app on the market manages one tunnel. If you need your work traffic going through a corporate connection and your personal browsing through a different provider, you choose one or the other. Activating a second tunnel deactivates the first.
                         </p>
                         <p>
-                            This is not a niche complaint. ProtonVPN's user forum has a request for simultaneous multi-tunnel support with over 224 votes. Mullvad closed their per-domain split tunneling request as infeasible. Firefox users have been asking for per-container tunnel routing since 2017.
+                            This is not a niche complaint. ProtonVPN's user forum has a request for simultaneous multi-tunnel support with over 224 votes. Mullvad closed their per-domain split tunneling request as not planned. Firefox users have been asking for per-container tunnel routing since 2017.
                         </p>
                         <p>
-                            The underlying operating system primitives exist. Policy-based routing, network namespaces, split DNS &mdash; these are standard capabilities. But using them requires dozens of lines of shell scripting and networking expertise that most people do not have.
+                            The underlying operating system primitives exist. Policy-based routing, network namespaces, split DNS. These are standard capabilities. But using them requires dozens of lines of shell scripting and networking expertise that most people do not have.
                         </p>
                         <p>
                             Nobody has built an interface that makes these workflows accessible. That's what ZKyNet is.
@@ -224,21 +224,21 @@
                     <h2 class="text-3xl sm:text-4xl font-bold text-white mb-8">Built in the open</h2>
                     <div class="grid sm:grid-cols-2 gap-6">
                         <div class="bg-slate-800 p-6 rounded-xl">
-                            <h3 class="text-lg font-semibold text-white mb-2">Open source</h3>
+                            <h3 class="text-lg font-semibold text-white mb-2">Transparent by design</h3>
                             <p class="text-gray-400 text-sm">
-                                ZKyNet's code is available on GitHub. Security claims you can verify yourself are the only kind worth making.
+                                Built on established, well-audited protocols. No proprietary tunneling. Security through proven standards, not obscurity.
                             </p>
                         </div>
                         <div class="bg-slate-800 p-6 rounded-xl">
                             <h3 class="text-lg font-semibold text-white mb-2">Established protocols</h3>
                             <p class="text-gray-400 text-sm">
-                                Built on WireGuard and OpenVPN &mdash; well-audited, widely trusted protocols. Not proprietary tunneling.
+                                Built on WireGuard and OpenVPN, both well-audited, widely trusted protocols. Not proprietary tunneling.
                             </p>
                         </div>
                         <div class="bg-slate-800 p-6 rounded-xl">
                             <h3 class="text-lg font-semibold text-white mb-2">Canadian incorporation</h3>
                             <p class="text-gray-400 text-sm">
-                                Federally incorporated in Canada (17204671 Canada Inc.) under PIPEDA. Clear legal jurisdiction.
+                                Federally incorporated in Canada (17204671 Canada Inc.). Subject to PIPEDA, Canada's federal privacy law. Clear legal jurisdiction.
                             </p>
                         </div>
                         <div class="bg-slate-800 p-6 rounded-xl">
@@ -271,7 +271,15 @@
         </main>
 
         <!-- Footer Container -->
-        <div id="footer-container"></div>
+        <div id="footer-container">
+            <noscript>
+                <footer class="bg-zky-dark py-8 border-t border-slate-800 text-center text-gray-400 text-sm">
+                    <p><a href="legal/privacy.html" class="text-gray-300 hover:text-white underline">Privacy Policy</a> &middot; <a href="legal/terms.html" class="text-gray-300 hover:text-white underline">Terms of Service</a> &middot; <a href="legal/refund.html" class="text-gray-300 hover:text-white underline">Refund Policy</a></p>
+                    <p class="mt-2">&copy; 2026 17204671 Canada Inc. (ZKyNet). All rights reserved.</p>
+                    <p class="mt-1">155-2 King Street West, Unit #299, Hamilton, ON L8P 4S0, Canada &middot; contact@zkynet.org</p>
+                </footer>
+            </noscript>
+        </div>
 
         <!-- JavaScript -->
         <script src="assets/js/main.js"></script>

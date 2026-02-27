@@ -21,14 +21,14 @@ Last updated: 2026-02-25
 
 ---
 
-## 2. "Closed as infeasible" — Mullvad per-domain split tunneling
+## 2. "Closed as not planned" — Mullvad per-domain split tunneling
 
 **File:** `index.html` lines 449–452
 **Also referenced in:** `src/about.html` line 173
 
-**Claim:** "Closed as infeasible — Mullvad's response to per-domain split tunneling requests."
+**Claim:** "Closed as not planned — Mullvad's response to per-domain split tunneling requests."
 
-**Status:** Misleading. Mullvad never used the word "infeasible." Their actual language was "not really planned," "not currently planning," and "way harder." One developer explicitly said it is "not technically impossible" but "has currently not been prioritized." GitHub issues were closed as `not_planned` or `completed` (as duplicate), never labeled "infeasible."
+**Status:** Accurate. Matches the actual GitHub issue label (`not_planned`). Mullvad's language was "not really planned," "not currently planning," and "way harder." One developer explicitly said it is "not technically impossible" but "has currently not been prioritized."
 
 **Sources:**
 
