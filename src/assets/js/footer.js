@@ -178,7 +178,7 @@ function renderFooter() {
                         <div class="text-gray-400 text-sm">
                             <p>&copy; 2026 17204671 Canada Inc. (ZKyNet). All rights reserved.</p>
                             <p class="mt-1">155-2 King Street West, Unit #299, Hamilton, ON L8P 4S0, Canada</p>
-                            <p class="mt-1">contact@zkynet.org</p>
+                            <p class="mt-1">contact@zkynet.org &middot; 647.600.2330</p>
                         </div>
                         <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-6 mt-4 md:mt-0 justify-center md:justify-end">
                             <a
