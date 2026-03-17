@@ -1,5 +1,6 @@
 # Temporary files (now organized in tmp/ directory)
 tmp/
+docs/ignored/
 
 # Node.js
 node_modules/
